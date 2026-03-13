@@ -1,0 +1,675 @@
+## Problem Statement
+
+You tune the custom Triton kernels to get better performance. Apply small, targeted edits
+to the latest kernel version to fix correctness errors or improve performance.
+
+## Hardware Information
+
+- GPU: NVIDIA B200, Blackwell architecture.
+
+## Correctness Error Analysis
+
+Your kernel produced incorrect results. Common causes:
+
+1. **Missing masks**: Check every tl.load() and tl.store() — add mask= for variable dims
+2. **bf16 accumulator**: Change tl.zeros(..., dtype=tl.bfloat16) → dtype=tl.float32
+3. **Wrong stride**: Don't assume contiguous layout — pass strides as arguments
+4. **Grid mismatch**: Verify grid dimensions match tl.program_id() usage
+5. **tl.dot K-dimension**: Must be multiple of 16 for tensor cores
+6. **Off-by-one in tiling**: Check boundary conditions for non-divisible dimensions
+## Task Instruction
+
+Kernel definition:
+```python
+{
+    "name": "gdn_prefill_qk4_v8_d128_k_last",
+    "description": "Gated Delta Net prefill with GVA configuration and k-last state layout. The state is in k-last layout [N, H, V, K]. Captured from Qwen3 Next linear attention layers (TP=4).",
+    "op_type": "gdn",
+    "tags": [
+        "stage:prefill",
+        "status:verified",
+        "model:qwen3-next",
+        "layout:k-last"
+    ],
+    "axes": {
+        "total_seq_len": {
+            "type": "var"
+        },
+        "num_seqs": {
+            "type": "var"
+        },
+        "num_q_heads": {
+            "type": "const",
+            "value": 4,
+            "description": "Number of query heads (same as key heads in GVA mode, TP=4, 16/4=4)."
+        },
+        "num_k_heads": {
+            "type": "const",
+            "value": 4,
+            "description": "Number of key heads (TP=4, 16/4=4)."
+        },
+        "num_v_heads": {
+            "type": "const",
+            "value": 8,
+            "description": "Number of value heads (GVA: more value heads than query heads, TP=4, 32/4=8)."
+        },
+        "head_size": {
+            "type": "const",
+            "value": 128
+        },
+        "len_cu_seqlens": {
+            "type": "var",
+            "description": "Length of cu_seqlens array (num_seqs + 1)."
+        }
+    },
+    "constraints": [
+        "len_cu_seqlens == num_seqs + 1",
+        "total_seq_len == cu_seqlens[-1].item()"
+    ],
+    "inputs": {
+        "q": {
+            "shape": [
+                "total_seq_len",
+                "num_q_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Query tensor."
+        },
+        "k": {
+            "shape": [
+                "total_seq_len",
+                "num_k_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Key tensor."
+        },
+        "v": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Value tensor."
+        },
+        "state": {
+            "shape": [
+                "num_seqs",
+                "num_v_heads",
+                "head_size",
+                "head_size"
+            ],
+            "dtype": "float32",
+            "description": "Recurrent state in k-last layout [N, H, V, K].",
+            "optional": true
+        },
+        "A_log": {
+            "shape": [
+                "num_v_heads"
+            ],
+            "dtype": "float32",
+            "description": "Log decay parameter (learnable). Used to compute g = exp(-exp(A_log) * softplus(a + dt_bias))."
+        },
+        "a": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads"
+            ],
+            "dtype": "bfloat16",
+            "description": "Input-dependent decay from projection."
+        },
+        "dt_bias": {
+            "shape": [
+                "num_v_heads"
+            ],
+            "dtype": "float32",
+            "description": "Decay bias (learnable). Added to 'a' before softplus."
+        },
+        "b": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads"
+            ],
+            "dtype": "bfloat16",
+            "description": "Update gate input from projection. beta = sigmoid(b)."
+        },
+        "cu_seqlens": {
+            "shape": [
+                "len_cu_seqlens"
+            ],
+            "dtype": "int64",
+            "description": "Cumulative sequence lengths for variable-length batching."
+        },
+        "scale": {
+            "shape": null,
+            "dtype": "float32",
+            "description": "Scale factor. Default is 1/sqrt(head_size)."
+        }
+    },
+    "outputs": {
+        "output": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Attention output. Shape follows num_v_heads in GVA mode."
+        },
+        "new_state": {
+            "shape": [
+                "num_seqs",
+                "num_v_heads",
+                "head_size",
+                "head_size"
+            ],
+            "dtype": "float32",
+            "description": "Updated recurrent state in k-last layout [N, H, V, K]."
+        }
+    },
+    "reference": "import math\nimport torch\nimport torch.nn.functional as F\n\n\ndef matmul(a: torch.Tensor, b: torch.Tensor):\n    \"\"\"Float32 matmul for numerical stability.\"\"\"\n    return a.float() @ b.float()\n\n\n@torch.no_grad()\ndef run(q, k, v, state, A_log, a, dt_bias, b, cu_seqlens, scale):\n    \"\"\"\n    Gated Delta Net prefill reference implementation (k-last layout).\n    \n    State layout: [H, V, K] (k-last, K dimension at the end)\n    \n    Gate computation:\n    g = exp(-exp(A_log) * softplus(a + dt_bias))\n    beta = sigmoid(b)\n    \n    Delta rule update:\n    state_new = g * state_old + k^T @ (beta * v + (1-beta) * k @ state_old) - k^T @ (k @ state_old)\n    output = scale * q @ state_new\n    \"\"\"\n    total_seq_len, num_q_heads, head_size = q.shape\n    num_v_heads = v.shape[1]\n    num_k_heads = k.shape[1]\n    num_sab_heads = max(num_q_heads, num_v_heads)\n    num_seqs = cu_seqlens.size(0) - 1\n    device = q.device\n\n    assert num_q_heads == 4\n    assert num_k_heads == 4\n    assert num_v_heads == 8\n    assert head_size == 128\n\n    if scale is None or scale == 0.0:\n        scale = 1.0 / math.sqrt(head_size)\n\n    # Compute g and beta from raw parameters\n    x = a.float() + dt_bias.float()  # [total_seq_len, HV]\n    g = torch.exp(-torch.exp(A_log.float()) * F.softplus(x))  # [total_seq_len, HV]\n    beta = torch.sigmoid(b.float())  # [total_seq_len, HV]\n\n    q_exp = q.repeat_interleave(num_v_heads // num_q_heads, dim=1)\n    k_exp = k.repeat_interleave(num_v_heads // num_k_heads, dim=1)\n\n    output = torch.zeros(\n        (total_seq_len, num_sab_heads, head_size), dtype=torch.bfloat16, device=device\n    )\n    new_state = torch.zeros(\n        (num_seqs, num_sab_heads, head_size, head_size), dtype=torch.float32, device=device\n    )\n\n    for seq_idx in range(num_seqs):\n        seq_start = int(cu_seqlens[seq_idx].item())\n        seq_end = int(cu_seqlens[seq_idx + 1].item())\n        seq_len = seq_end - seq_start\n\n        if seq_len <= 0:\n            continue\n\n        if state is not None:\n            state_HKV = state[seq_idx].clone().float().transpose(-1, -2)  # [H,V,K] -> [H,K,V]\n        else:\n            state_HKV = torch.zeros(\n                (num_sab_heads, head_size, head_size), dtype=torch.float32, device=device\n            )\n\n        for i in range(seq_len):\n            t = seq_start + i\n            q_H1K = q_exp[t].unsqueeze(1).float()\n            k_H1K = k_exp[t].unsqueeze(1).float()\n            v_H1V = v[t].unsqueeze(1).float()\n            g_H11 = g[t].unsqueeze(1).unsqueeze(2)\n            beta_H11 = beta[t].unsqueeze(1).unsqueeze(2)\n\n            old_state_HKV = g_H11 * state_HKV\n            old_v_H1V = matmul(k_H1K, old_state_HKV)\n            new_v_H1V = beta_H11 * v_H1V + (1 - beta_H11) * old_v_H1V\n            state_remove = torch.einsum('hkl,hlv->hkv', k_H1K.transpose(-1, -2), old_v_H1V)\n            state_update = torch.einsum('hkl,hlv->hkv', k_H1K.transpose(-1, -2), new_v_H1V)\n            state_HKV = old_state_HKV - state_remove + state_update\n\n            o_H1V = scale * matmul(q_H1K, state_HKV)\n            output[t] = o_H1V.squeeze(1).to(torch.bfloat16)\n\n        new_state[seq_idx] = state_HKV.transpose(-1, -2)  # [H,K,V] -> [H,V,K]\n\n    return output, new_state"
+}
+```
+
+The input shapes and dtype are: {'q': {'shape': ['total_seq_len', 'num_q_heads', 'head_size'], 'dtype': 'bfloat16', 'description': 'Query tensor.'}, 'k': {'shape': ['total_seq_len', 'num_k_heads', 'head_size'], 'dtype': 'bfloat16', 'description': 'Key tensor.'}, 'v': {'shape': ['total_seq_len', 'num_v_heads', 'head_size'], 'dtype': 'bfloat16', 'description': 'Value tensor.'}, 'state': {'shape': ['num_seqs', 'num_v_heads', 'head_size', 'head_size'], 'dtype': 'float32', 'description': 'Recurrent state in k-last layout [N, H, V, K].', 'optional': True}, 'A_log': {'shape': ['num_v_heads'], 'dtype': 'float32', 'description': 'Log decay parameter (learnable). Used to compute g = exp(-exp(A_log) * softplus(a + dt_bias)).'}, 'a': {'shape': ['total_seq_len', 'num_v_heads'], 'dtype': 'bfloat16', 'description': 'Input-dependent decay from projection.'}, 'dt_bias': {'shape': ['num_v_heads'], 'dtype': 'float32', 'description': "Decay bias (learnable). Added to 'a' before softplus."}, 'b': {'shape': ['total_seq_len', 'num_v_heads'], 'dtype': 'bfloat16', 'description': 'Update gate input from projection. beta = sigmoid(b).'}, 'cu_seqlens': {'shape': ['len_cu_seqlens'], 'dtype': 'int64', 'description': 'Cumulative sequence lengths for variable-length batching.'}, 'scale': {'shape': None, 'dtype': 'float32', 'description': 'Scale factor. Default is 1/sqrt(head_size).'}}
+
+### Test Conditions
+- **Correctness**: Verified against reference implementation
+- **Warm-up**: 3 runs (autotuning happens here)
+- **Performance**: 100 runs for timing
+
+### Edit Format
+
+Apply targeted str_replace edits. Keep the high-level architecture unchanged.
+
+CRITICAL RULES:
+1. `old_str` must match EXACTLY (including whitespace and indentation)
+2. `old_str` must be unique in the file (include 3-5 lines of context)
+3. `new_str` must be different from `old_str`
+4. Send ALL edits in a single response
+
+Output format:
+
+<reasoning_1>
+// why this edit improves the kernel
+</reasoning_1>
+<old_str_1>
+// exact code to replace
+</old_str_1>
+<new_str_1>
+// improved code
+</new_str_1>
+
+### Previous Kernels and Metrics:
+
+<Previous Kernels and Metrics>
+
+### 0-th attempt:
+
+```python
+import math
+import torch
+import triton
+import triton.language as tl
+import torch.nn.functional as F
+
+
+@triton.jit
+def gdn_prefill_kernel(
+    # Input pointers
+    q_ptr, k_ptr, v_ptr, state_ptr,
+    A_log_ptr, a_ptr, dt_bias_ptr, b_ptr,
+    cu_seqlens_ptr, scale_val,
+    # Output pointers
+    output_ptr, new_state_ptr,
+    # Strides for q [total_seq_len, num_q_heads, head_size]
+    stride_q_t, stride_q_h, stride_q_d,
+    # Strides for k [total_seq_len, num_k_heads, head_size]
+    stride_k_t, stride_k_h, stride_k_d,
+    # Strides for v [total_seq_len, num_v_heads, head_size]
+    stride_v_t, stride_v_h, stride_v_d,
+    # Strides for state [num_seqs, num_v_heads, head_size, head_size] (k-last: [N,H,V,K])
+    stride_s_n, stride_s_h, stride_s_v, stride_s_k,
+    # Strides for a [total_seq_len, num_v_heads]
+    stride_a_t, stride_a_h,
+    # Strides for b [total_seq_len, num_v_heads]
+    stride_b_t, stride_b_h,
+    # Strides for output [total_seq_len, num_v_heads, head_size]
+    stride_o_t, stride_o_h, stride_o_d,
+    # Dimensions
+    num_q_heads: tl.constexpr,
+    num_k_heads: tl.constexpr,
+    num_v_heads: tl.constexpr,
+    head_size: tl.constexpr,
+    CHUNK_SIZE: tl.constexpr,
+    BK: tl.constexpr,
+):
+    """
+    GDN prefill kernel - processes one (seq, v_head) pair per program.
+    Uses chunkwise processing for efficiency.
+    Grid: (num_seqs, num_v_heads)
+    """
+    i_seq = tl.program_id(0)
+    i_hv = tl.program_id(1)
+    
+    # GVA mapping: v_head -> q/k head
+    gva_ratio = num_v_heads // num_q_heads  # = 2
+    i_hq = i_hv // gva_ratio
+    
+    # Get sequence bounds
+    seq_start = tl.load(cu_seqlens_ptr + i_seq).to(tl.int32)
+    seq_end = tl.load(cu_seqlens_ptr + i_seq + 1).to(tl.int32)
+    seq_len = seq_end - seq_start
+    
+    if seq_len <= 0:
+        return
+    
+    # Load A_log and dt_bias for this v_head
+    A_log_val = tl.load(A_log_ptr + i_hv).to(tl.float32)
+    dt_bias_val = tl.load(dt_bias_ptr + i_hv).to(tl.float32)
+    
+    # Initialize state from input (k-last layout: [N, H_v, V, K])
+    # State shape: [head_size(V), head_size(K)] = [128, 128]
+    offs_v = tl.arange(0, head_size)  # V dimension (rows)
+    offs_k = tl.arange(0, BK)         # K dimension (cols), BK=128
+    
+    state_base = i_seq * stride_s_n + i_hv * stride_s_h
+    s_ptrs = state_ptr + state_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k
+    
+    # Load state: [V, K] = [128, 128]
+    if state_ptr != output_ptr:  # state is provided
+        state = tl.load(s_ptrs)  # [head_size, BK] = [128, 128]
+    else:
+        state = tl.zeros([head_size, BK], dtype=tl.float32)
+    
+    # Process tokens sequentially
+    num_chunks = tl.cdiv(seq_len, CHUNK_SIZE)
+    
+    for chunk_idx in range(num_chunks):
+        chunk_start = chunk_idx * CHUNK_SIZE
+        chunk_end = tl.minimum(chunk_start + CHUNK_SIZE, seq_len)
+        
+        for i in range(CHUNK_SIZE):
+            t_local = chunk_start + i
+            if t_local >= seq_len:
+                break
+            t = seq_start + t_local
+            
+            # Load q, k for this token
+            q_base = t * stride_q_t + i_hq * stride_q_h
+            k_base = t * stride_k_t + i_hq * stride_k_h
+            v_base = t * stride_v_t + i_hv * stride_v_h
+            
+            q_vec = tl.load(q_ptr + q_base + offs_k).to(tl.float32)  # [K]
+            k_vec = tl.load(k_ptr + k_base + offs_k).to(tl.float32)  # [K]
+            v_vec = tl.load(v_ptr + v_base + offs_v).to(tl.float32)  # [V]
+            
+            # Load a and b
+            a_val = tl.load(a_ptr + t * stride_a_t + i_hv * stride_a_h).to(tl.float32)
+            b_val = tl.load(b_ptr + t * stride_b_t + i_hv * stride_b_h).to(tl.float32)
+            
+            # Compute g and beta
+            x = a_val + dt_bias_val
+            # softplus(x) = log(1 + exp(x))
+            softplus_x = tl.log(1.0 + tl.exp(x))
+            g = tl.exp(-tl.exp(A_log_val) * softplus_x)
+            beta = tl.sigmoid(b_val)
+            
+            # State update:
+            # old_state = g * state  [V, K]
+            # k_state = old_state @ k  (sum over K dim) -> [V]
+            # new_v = beta * v + (1 - beta) * k_state  [V]
+            # state = old_state + k^T @ (new_v - k_state)  [V,K]
+            # = old_state + (new_v - k_state)[:, None] * k[None, :]
+            # = old_state + beta * (v - k_state)[:, None] * k[None, :]
+            
+            # Decay state
+            state = g * state  # [V, K]
+            
+            # Compute k @ state (dot product for each V row)
+            # k_state[v] = sum_k state[v, k] * k_vec[k]
+            k_state = tl.sum(state * k_vec[None, :], axis=1)  # [V]
+            
+            # Delta: beta * (v - k_state)
+            delta = beta * (v_vec - k_state)  # [V]
+            
+            # Update state: state += delta[:, None] * k_vec[None, :]
+            state = state + delta[:, None] * k_vec[None, :]  # [V, K]
+            
+            # Compute output: scale * q @ state^T
+            # output[v] = scale * sum_k q[k] * state[v, k]
+            out_vec = scale_val * tl.sum(state * q_vec[None, :], axis=1)  # [V]
+            
+            # Store output
+            out_base = t * stride_o_t + i_hv * stride_o_h
+            tl.store(output_ptr + out_base + offs_v, out_vec.to(tl.bfloat16))
+    
+    # Store final state
+    ns_base = i_seq * stride_s_n + i_hv * stride_s_h
+    ns_ptrs = new_state_ptr + ns_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k
+    tl.store(ns_ptrs, state)
+
+
+@triton.jit
+def gdn_prefill_kernel_v2(
+    # Input pointers
+    q_ptr, k_ptr, v_ptr, state_ptr,
+    A_log_ptr, a_ptr, dt_bias_ptr, b_ptr,
+    cu_seqlens_ptr,
+    # Output pointers
+    output_ptr, new_state_ptr,
+    # Strides for q [total_seq_len, num_q_heads, head_size]
+    stride_q_t, stride_q_h, stride_q_d,
+    # Strides for k [total_seq_len, num_k_heads, head_size]
+    stride_k_t, stride_k_h, stride_k_d,
+    # Strides for v [total_seq_len, num_v_heads, head_size]
+    stride_v_t, stride_v_h, stride_v_d,
+    # Strides for state [num_seqs, num_v_heads, head_size, head_size] (k-last: [N,H,V,K])
+    stride_s_n, stride_s_h, stride_s_v, stride_s_k,
+    # Strides for a [total_seq_len, num_v_heads]
+    stride_a_t, stride_a_h,
+    # Strides for b [total_seq_len, num_v_heads]
+    stride_b_t, stride_b_h,
+    # Strides for output [total_seq_len, num_v_heads, head_size]
+    stride_o_t, stride_o_h, stride_o_d,
+    # Scale
+    scale_val: tl.constexpr,
+    # Dimensions
+    num_q_heads: tl.constexpr,
+    num_k_heads: tl.constexpr,
+    num_v_heads: tl.constexpr,
+    head_size: tl.constexpr,
+    BV: tl.constexpr,
+    BK: tl.constexpr,
+):
+    """
+    GDN prefill kernel with tiled V dimension.
+    Grid: (num_seqs, num_v_heads, num_v_tiles)
+    Each block handles a BV-sized tile of the V dimension.
+    """
+    i_seq = tl.program_id(0)
+    i_hv = tl.program_id(1)
+    i_tv = tl.program_id(2)
+    
+    # GVA mapping
+    gva_ratio = num_v_heads // num_q_heads
+    i_hq = i_hv // gva_ratio
+    
+    # Get sequence bounds
+    seq_start = tl.load(cu_seqlens_ptr + i_seq).to(tl.int32)
+    seq_end = tl.load(cu_seqlens_ptr + i_seq + 1).to(tl.int32)
+    seq_len = seq_end - seq_start
+    
+    if seq_len <= 0:
+        return
+    
+    # Load A_log and dt_bias for this v_head
+    A_log_val = tl.load(A_log_ptr + i_hv).to(tl.float32)
+    dt_bias_val = tl.load(dt_bias_ptr + i_hv).to(tl.float32)
+    
+    # V tile offsets
+    offs_v = i_tv * BV + tl.arange(0, BV)
+    v_mask = offs_v < head_size
+    offs_k = tl.arange(0, BK)
+    
+    # Load state tile: [BV, BK]
+    state_base = i_seq * stride_s_n + i_hv * stride_s_h
+    s_ptrs = state_ptr + state_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k
+    
+    if state_ptr != new_state_ptr:
+        state_tile = tl.load(s_ptrs, mask=v_mask[:, None], other=0.0)
+    else:
+        state_tile = tl.zeros([BV, BK], dtype=tl.float32)
+    
+    # Process tokens sequentially
+    for t_local in range(seq_len):
+        t = seq_start + t_local
+        
+        # Load k (full K dimension)
+        k_base = t * stride_k_t + i_hq * stride_k_h
+        k_vec = tl.load(k_ptr + k_base + offs_k).to(tl.float32)  # [BK]
+        
+        # Load v (BV slice)
+        v_base = t * stride_v_t + i_hv * stride_v_h
+        v_vec = tl.load(v_ptr + v_base + offs_v, mask=v_mask, other=0.0).to(tl.float32)  # [BV]
+        
+        # Load a and b for this v_head
+        a_val = tl.load(a_ptr + t * stride_a_t + i_hv * stride_a_h).to(tl.float32)
+        b_val = tl.load(b_ptr + t * stride_b_t + i_hv * stride_b_h).to(tl.float32)
+        
+        # Compute g and beta
+        x = a_val + dt_bias_val
+        softplus_x = tl.log(1.0 + tl.exp(x))
+        g = tl.exp(-tl.exp(A_log_val) * softplus_x)
+        beta_val = tl.sigmoid(b_val)
+        
+        # Decay
+        state_tile = g * state_tile  # [BV, BK]
+        
+        # k_state = state @ k: [BV]
+        k_state = tl.sum(state_tile * k_vec[None, :], axis=1)  # [BV]
+        
+        # Delta update
+        delta = beta_val * (v_vec - k_state)  # [BV]
+        state_tile = state_tile + delta[:, None] * k_vec[None, :]  # [BV, BK]
+        
+        # Load q and compute output
+        q_base = t * stride_q_t + i_hq * stride_q_h
+        q_vec = tl.load(q_ptr + q_base + offs_k).to(tl.float32)  # [BK]
+        
+        out_vec = tl.sum(state_tile * q_vec[None, :], axis=1)  # [BV]
+        
+        # Store output (scale applied)
+        out_base = t * stride_o_t + i_hv * stride_o_h
+        tl.store(output_ptr + out_base + offs_v, 
+                 (out_vec * scale_val).to(tl.bfloat16), 
+                 mask=v_mask)
+    
+    # Store final state tile
+    ns_base = i_seq * stride_s_n + i_hv * stride_s_h
+    ns_ptrs = new_state_ptr + ns_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k
+    tl.store(ns_ptrs, state_tile, mask=v_mask[:, None])
+
+
+# Chunked version for longer sequences - processes CHUNK_SIZE tokens at once using tl.dot
+@triton.autotune(
+    configs=[
+        triton.Config({'CHUNK_SIZE': 16, 'BV': 128}, num_warps=4, num_stages=2),
+        triton.Config({'CHUNK_SIZE': 32, 'BV': 128}, num_warps=4, num_stages=2),
+        triton.Config({'CHUNK_SIZE': 64, 'BV': 128}, num_warps=8, num_stages=2),
+        triton.Config({'CHUNK_SIZE': 16, 'BV': 64}, num_warps=4, num_stages=2),
+        triton.Config({'CHUNK_SIZE': 32, 'BV': 64}, num_warps=4, num_stages=2),
+    ],
+    key=['head_size', 'num_v_heads'],
+)
+@triton.jit
+def gdn_prefill_chunked_kernel(
+    # Input pointers
+    q_ptr, k_ptr, v_ptr, state_ptr,
+    A_log_ptr, a_ptr, dt_bias_ptr, b_ptr,
+    cu_seqlens_ptr,
+    # Output pointers
+    output_ptr, new_state_ptr,
+    # Strides
+    stride_q_t, stride_q_h,
+    stride_k_t, stride_k_h,
+    stride_v_t, stride_v_h,
+    stride_s_n, stride_s_h, stride_s_v, stride_s_k,
+    stride_a_t, stride_a_h,
+    stride_b_t, stride_b_h,
+    stride_o_t, stride_o_h,
+    # Scale
+    scale_val,
+    # Dimensions
+    num_q_heads: tl.constexpr,
+    num_v_heads: tl.constexpr,
+    head_size: tl.constexpr,
+    CHUNK_SIZE: tl.constexpr,
+    BV: tl.constexpr,
+):
+    """
+    GDN prefill with chunked processing.
+    Within each chunk, we process tokens sequentially but with vectorized operations.
+    Grid: (num_seqs * num_v_heads, num_v_tiles)
+    """
+    i_sv = tl.program_id(0)
+    i_tv = tl.program_id(1)
+    
+    i_seq = i_sv // num_v_heads
+    i_hv = i_sv % num_v_heads
+    
+    # GVA mapping
+    gva_ratio = num_v_heads // num_q_heads
+    i_hq = i_hv // gva_ratio
+    
+    # Get sequence bounds
+    seq_start = tl.load(cu_seqlens_ptr + i_seq).to(tl.int32)
+    seq_end = tl.load(cu_seqlens_ptr + i_seq + 1).to(tl.int32)
+    seq_len = seq_end - seq_start
+    
+    if seq_len <= 0:
+        return
+    
+    # Load A_log and dt_bias
+    A_log_val = tl.load(A_log_ptr + i_hv).to(tl.float32)
+    dt_bias_val = tl.load(dt_bias_ptr + i_hv).to(tl.float32)
+    
+    # V tile
+    offs_v = i_tv * BV + tl.arange(0, BV)
+    v_mask = offs_v < head_size
+    offs_k = tl.arange(0, head_size)
+    
+    # Load state tile
+    state_base = i_seq * stride_s_n + i_hv * stride_s_h
+    s_ptrs = state_ptr + state_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k
+    
+    if state_ptr != new_state_ptr:
+        state_tile = tl.load(s_ptrs, mask=v_mask[:, None], other=0.0)
+    else:
+        state_tile = tl.zeros([BV, head_size], dtype=tl.float32)
+    
+    # Process tokens
+    for t_local in range(seq_len):
+        t = seq_start + t_local
+        
+        k_base = t * stride_k_t + i_hq * stride_k_h
+        k_vec = tl.load(k_ptr + k_base + offs_k).to(tl.float32)
+        
+        v_base = t * stride_v_t + i_hv * stride_v_h
+        v_vec = tl.load(v_ptr + v_base + offs_v, mask=v_mask, other=0.0).to(tl.float32)
+        
+        a_val = tl.load(a_ptr + t * stride_a_t + i_hv * stride_a_h).to(tl.float32)
+        b_val = tl.load(b_ptr + t * stride_b_t + i_hv * stride_b_h).to(tl.float32)
+        
+        x = a_val + dt_bias_val
+        softplus_x = tl.log(1.0 + tl.exp(x))
+        g = tl.exp(-tl.exp(A_log_val) * softplus_x)
+        beta_val = tl.sigmoid(b_val)
+        
+        state_tile = g * state_tile
+        k_state = tl.sum(state_tile * k_vec[None, :], axis=1)
+        delta = beta_val * (v_vec - k_state)
+        state_tile = state_tile + delta[:, None] * k_vec[None, :]
+        
+        q_base = t * stride_q_t + i_hq * stride_q_h
+        q_vec = tl.load(q_ptr + q_base + offs_k).to(tl.float32)
+        
+        out_vec = scale_val * tl.sum(state_tile * q_vec[None, :], axis=1)
+        
+        out_base = t * stride_o_t + i_hv * stride_o_h
+        tl.store(output_ptr + out_base + offs_v,
+                 out_vec.to(tl.bfloat16),
+                 mask=v_mask)
+    
+    ns_base = i_seq * stride_s_n + i_hv * stride_s_h
+    ns_ptrs = new_state_ptr + ns_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k
+    tl.store(ns_ptrs, state_tile, mask=v_mask[:, None])
+
+
+@torch.no_grad()
+def run(q, k, v, state, A_log, a, dt_bias, b, cu_seqlens, scale):
+    """
+    Gated Delta Net prefill with Triton kernel.
+    
+    Inputs:
+        q: [total_seq_len, num_q_heads, head_size] bfloat16
+        k: [total_seq_len, num_k_heads, head_size] bfloat16
+        v: [total_seq_len, num_v_heads, head_size] bfloat16
+        state: [num_seqs, num_v_heads, head_size, head_size] float32 or None (k-last layout)
+        A_log: [num_v_heads] float32
+        a: [total_seq_len, num_v_heads] bfloat16
+        dt_bias: [num_v_heads] float32
+        b: [total_seq_len, num_v_heads] bfloat16
+        cu_seqlens: [num_seqs + 1] int64
+        scale: float32 scalar
+    
+    Returns:
+        output: [total_seq_len, num_v_heads, head_size] bfloat16
+        new_state: [num_seqs, num_v_heads, head_size, head_size] float32
+    """
+    total_seq_len, num_q_heads, head_size = q.shape
+    num_v_heads = v.shape[1]
+    num_k_heads = k.shape[1]
+    num_seqs = cu_seqlens.shape[0] - 1
+    device = q.device
+    
+    if scale is None or scale == 0.0:
+        scale = 1.0 / math.sqrt(head_size)
+    
+    # Allocate outputs
+    output = torch.empty(total_seq_len, num_v_heads, head_size, dtype=torch.bfloat16, device=device)
+    new_state = torch.zeros(num_seqs, num_v_heads, head_size, head_size, dtype=torch.float32, device=device)
+    
+    # If state provided, copy to new_state as starting point
+    if state is not None:
+        new_state.copy_(state)
+        state_in_ptr = new_state
+    else:
+        state_in_ptr = new_state  # starts as zeros
+    
+    # Ensure contiguous
+    q = q.contiguous()
+    k = k.contiguous()
+    v = v.contiguous()
+    a = a.contiguous()
+    b = b.contiguous()
+    
+    BV = min(128, head_size)
+    num_v_tiles = triton.cdiv(head_size, BV)
+    
+    # Grid: (num_seqs * num_v_heads, num_v_tiles)
+    grid = (num_seqs * num_v_heads, num_v_tiles)
+    
+    gdn_prefill_chunked_kernel[grid](
+        q, k, v, state_in_ptr,
+        A_log, a, dt_bias, b,
+        cu_seqlens,
+        output, new_state,
+        # q strides
+        q.stride(0), q.stride(1),
+        # k strides
+        k.stride(0), k.stride(1),
+        # v strides
+        v.stride(0), v.stride(1),
+        # state strides [N, H_v, V, K]
+        new_state.stride(0), new_state.stride(1), new_state.stride(2), new_state.stride(3),
+        # a strides
+        a.stride(0), a.stride(1),
+        # b strides
+        b.stride(0), b.stride(1),
+        # output strides
+        output.stride(0), output.stride(1),
+        # scale
+        scale,
+        # dimensions
+        num_q_heads, num_v_heads, head_size,
+    )
+    
+    return output, new_state
+```
+
+### 0-th Runtime Metrics:
+compiled=True correct=False speedup=0.0 latency_ms=None task_id='gdn_prefill_qk4_v8_d128_k_last' error='RUNTIME_ERROR: Traceback (most recent call last):\n  File "/usr/local/lib/python3.12/site-packages/flashinfer_bench/bench/evaluators/default.py", line 116, in check_correctness\n    result = sol_runnable(*inp)\n             ^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/flashinfer_bench/compile/runnable.py", line 95, in __call__\n    ret = self._callable(*args)\n          ^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File "/root/.cache/flashinfer_bench/cache/triton/fib_triton_kernforge_0a07a599_497905/fib_triton_kernforge_0a07a599_497905/main.py", line 434, in run\n    gdn_prefill_chunked_kernel[grid](\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/jit.py", line 370, in <lambda>\n    return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/autotuner.py", line 240, in run\n    benchmark()\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/autotuner.py", line 229, in benchmark\n    timings = {config: self._bench(*args, config=config, **kwargs) for config in pruned_configs}\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/autotuner.py", line 164, in _bench\n    return self.do_bench(kernel_call, quantiles=(0.5, 0.2, 0.8))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/triton/testing.py", line 149, in do_bench\n    fn()\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/autotuner.py", line 150, in kernel_call\n    self.fn.run(\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/jit.py", line 720, in run\n    kernel = self._do_compile(key, signature, device, constexprs, options, attrs, warmup)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/triton/runtime/jit.py", line 849, in _do_compile\n    kernel = self.compile(src, target=target, options=options.__dict__)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/triton/compiler/compiler.py", line 304, in compile\n    module = src.make_ir(target, options, codegen_fns, module_map, context)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/triton/compiler/compiler.py", line 80, in make_ir\n    return ast_to_ttir(self.fn, self, context=context, options=options, codegen_fns=codegen_fns,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntriton.compiler.errors.CompilationError: at 61:7:\n    dt_bias_val = tl.load(dt_bias_ptr + i_hv).to(tl.float32)\n\n    # V tile\n    offs_v = i_tv * BV + tl.arange(0, BV)\n    v_mask = offs_v < head_size\n    offs_k = tl.arange(0, head_size)\n\n    # Load state tile\n    state_base = i_seq * stride_s_n + i_hv * stride_s_h\n    s_ptrs = state_ptr + state_base + offs_v[:, None] * stride_s_v + offs_k[None, :] * stride_s_k\n\n    if state_ptr != new_state_ptr:\n       ^\nIncompatibleTypeErrorImpl(\'invalid operands of type pointer<fp32> and pointer<fp32>\')\n' stats=None
+</Previous Kernels and Metrics>

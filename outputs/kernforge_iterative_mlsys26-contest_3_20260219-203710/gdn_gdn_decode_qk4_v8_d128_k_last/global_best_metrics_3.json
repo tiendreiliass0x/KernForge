@@ -1,0 +1,9 @@
+{
+    "compiled": true,
+    "correct": false,
+    "speedup": 0.0,
+    "latency_ms": null,
+    "task_id": "gdn_decode_qk4_v8_d128_k_last",
+    "error": "RUNTIME_ERROR: Traceback (most recent call last):\n  File \"/usr/local/lib/python3.12/site-packages/flashinfer_bench/bench/evaluators/default.py\", line 116, in check_correctness\n    result = sol_runnable(*inp)\n             ^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/site-packages/flashinfer_bench/compile/runnable.py\", line 95, in __call__\n    ret = self._callable(*args)\n          ^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/.cache/flashinfer_bench/cache/triton/fib_triton_kernforge_c697caa3_1cdef9/fib_triton_kernforge_c697caa3_1cdef9/main.py\", line 65, in run\n    B, H_q, K = q.shape\n    ^^^^^^^^^\nValueError: too many values to unpack (expected 3)\n",
+    "stats": null
+}

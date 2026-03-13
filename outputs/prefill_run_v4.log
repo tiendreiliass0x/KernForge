@@ -1,0 +1,236 @@
+✓ Initialized. View run at 
+https://modal.com/apps/tiiliass/main/ap-nOHbA2XUqndOxygvs2CRW8
+✓ Created objects.
+└── 🔨 Created function create_modal_app.<locals>.remote_eval_kernel.
+2026-02-23 16:51:29,785 - INFO - Dataset 'mlsys26-contest' found in Modal Volume, skipping upload
+Processing problems:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-23 16:51:30,069 - INFO - Loaded 0 strategy records from /Users/iliasstiendre/.kernforge/strategy_db.json
+
+_gdn_prefill_qk4_v8_d128_k_last:   0%|          | 0/25 [00:00<?, ?it/s][A2026-02-23 16:53:09,629 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 13.1.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+Solution 'kernforge_0a07a599' for workload 17775095-78aa-4d5c-8107-5544fe57f3a7: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload c75d2de4-1286-4a83-8150-e385a92bac91: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload de7af853-9c30-4e68-a0b7-6c6cd001b0ca: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 5b25d369-fb17-46d1-af28-8edbe0332f91: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload a10583dd-241e-49f9-874b-dbffd8265e33: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload db06869f-b23e-40c4-84c0-7092252062a8: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 90113212-581d-487e-9c0f-68447f0e4595: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 134a37d2-e292-4b10-8ac7-37e066828abe: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload c4349ccd-2d92-471e-8c7e-8ae218ea77b1: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 4a2ee8aa-dfe9-4529-9c48-6b1efbbed59e: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 40eb4f76-331e-470a-a82d-cc607392cc53: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 4c97e5d8-0194-49fd-9869-7dc2c097919d: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 08ac8463-00e3-45d6-8584-3c6ddc6b8262: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 25915dcb-c733-4453-ba0e-48502152f27f: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload df7a2ce1-274e-453e-bc9e-ebdec15fcb5e: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 991b0754-ca56-4a0d-8c60-67fb6d2470d1: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 9d3288c7-7a2a-4303-86d9-c0d62c1b7d51: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload b442a48b-8eac-484b-8f78-827ffcc22a2f: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 5fb4af1e-52aa-4e38-bbde-f81dc29f9fca: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 77b0a677-1aa2-48cb-8a3c-40b58c7e362c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 2142bbf9-1947-4d7f-a2b5-a7c46b041791: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 0fbe0995-d08b-4475-94e8-777fb37d2a1b: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 6e32a0fb-8260-4b5d-8443-cf5748e6bf49: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload a56f5e16-c5ee-4dc6-b714-27df96c44da6: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload b6559a68-867a-4f52-a5a8-7ad81cbec17f: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 20e98c2f-f576-413b-8d7d-0274c77391dd: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 6d519dae-d01e-4c30-a56e-e82d96cdebe8: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 4bda04ed-0ffe-4fba-bbb3-6f8f1f4cb162: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 6f9ee359-39b6-4625-a5bd-9c3985bab231: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 68a2e6bd-f715-4f5e-af00-007be5a7c70a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload c550f91a-f618-4a46-9505-75842fd68528: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload b578df96-879d-4ec0-bae7-7803b87beb3a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload cfba415c-04aa-4d36-948d-bc163aac2425: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 1eb8b329-687d-4895-81ac-9759db0305b6: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 22b2b40a-a828-4be3-82be-4f5b2fa7d117: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 8f1fb046-df9e-4cce-ab89-56e334cec48c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload f06d6d2a-828f-4352-8a04-f571ff6a8da2: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 821ff47d-8e2d-4ec2-9b69-6429cca83908: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 880e3744-7f0c-4fcc-a796-cd068af35680: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload c9d6b501-1435-41ee-9e24-6438c68e5aec: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload b5c4614a-26d7-437d-9529-08b1d64de2e0: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload be64ce12-d9ab-4d6b-9ce7-6b8a03138368: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 8555edb4-03c5-423f-8c4d-c92f9073d1b5: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 8a2c81fb-ff88-42bc-9bf8-5603af845f21: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 6640985a-f059-4792-89e6-756dad4ce970: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 79d22c27-8a98-4de0-a42c-f88d1d539434: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 832ada3c-2add-4d14-8b37-b2c61ef95dfc: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload d03e41bc-71d0-4a10-a449-d282f06c41ee: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 297fc3dd-9605-41f6-af52-93c91b96d8aa: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload eede4685-fca2-4cd9-bf05-6e8471f86b54: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload bd27f010-c3f5-4dd0-b342-dabb9d6c6ea5: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 2fa795f8-95ac-4ca9-b419-57c72a289257: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 6a0099b9-8ca7-4a35-a3c5-c3d20dac970a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload a1610987-dad7-477d-8436-1a032a6bcab4: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 68fb51c2-15b7-458f-a7a7-02915ea0303b: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 324db839-9379-432c-aab7-e34ba42a8e4c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload c2d7fd77-731a-4d40-8ad7-9e09b9592d87: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 82e5f4c5-8480-4247-ae92-7f782fc358db: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 60a2f9ce-2e86-438a-89d1-135d6321b90c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 9a561f9d-e554-4ca6-9f0c-e53561b79a9c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload a37c14cb-3a6f-4353-b513-f9261adeef92: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload ef315c67-b654-4cdb-8170-104a8177a867: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload c2bc09ca-e152-45a0-ab51-0b6654014e3c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload f21b31c1-82ea-4c59-9c56-2cb992b65c1f: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload abf50422-80e4-4f82-8d2e-8766f1bbc27a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload ff021daa-f8fa-4c1e-acd8-0b7f3cc5ac85: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 50e5f14a-499b-45f9-8959-ec111703ad5f: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload aeb0572e-a92e-496e-be9d-362effe14e76: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 8f5cd090-0344-41ca-ba83-88923ff882ab: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 14f9744d-b13d-4cdd-8128-f9592a4793bf: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload fa2d3073-5531-427a-9fe7-a2dae916f085: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 35d6fdb4-cac3-4877-b790-009f50392f8a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload a92164cd-f50b-4ef1-8d88-087c4ce8b104: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 5c99b7ad-56db-40b4-8ec5-db4f03a7ad0e: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 17ced75f-21bc-4e39-a978-c0c2c54565fa: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 1e11eafb-5a42-455d-ac6d-e9c52937e709: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 40691547-206d-40cf-a0f9-8700eb984a3f: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 2054b73e-994c-4566-8942-7f4167c0be27: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 2c3f09d7-dcf9-4d29-ba58-3e3ae4c92f0a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 495ae231-1710-47e8-a08e-c2c7104ebd0c: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload a6b3a862-e7ac-4e7d-b398-756804e34a28: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 826ffb07-3060-4c67-82cc-c4dbd6cf9f7a: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload e75ba4fa-c924-43ff-8a8e-391a8015f463: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload fa3fdcdd-3f8c-4cc4-91ff-f36f83740ae3: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 880252de-b4f9-4afe-b8f2-3872d90c9474: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 1cf3f97b-c098-49ec-8083-4153ef6bbc53: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 95021749-8e4e-4476-a7c6-fc8f06020633: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload da0b52da-28f8-4dd2-afcb-52521af78817: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 96f24530-b063-4c2c-8be2-5fe1b33da852: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload ba273ca5-e440-4f81-b119-011c12ff390b: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload bdb3efc1-cde9-45dd-83e0-6ccdf2b4b3f4: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 1a93efbf-c56a-4da9-9996-ab8e96ae9a9e: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 94df3a3f-beb5-4a75-aade-e1e685c8abb8: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 58a0a9ac-7a67-4b52-b4a6-4292a220bffa: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 0ef62a4c-5a90-4b0b-abec-8a372ca8eec0: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 78832b59-aef7-495e-9b9d-bd37192dbf54: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload 80b118c8-706f-412a-9915-e68b94babcd9: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload fdaeab92-411b-4ffe-8a39-449226757979: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload e42f20b5-1f3e-468e-989c-cf5dc8f9bc69: RUNTIME_ERROR
+Solution 'kernforge_0a07a599' for workload be1d0b74-c734-4ed2-89d0-8f93d9c28849: RUNTIME_ERROR
+2026-02-23 17:01:47,800 - INFO -   Step 1: New best — compiled=True, correct=False, speedup=0.000
+
+_gdn_prefill_qk4_v8_d128_k_last:   4%|▍         | 1/25 [10:17<4:07:05, 617.73s/it][A2026-02-23 17:02:33,629 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-02-23 17:02:33,641 - WARNING - str_replace: old_str not found in content
+Solution 'kernforge_9645bd66' for workload 17775095-78aa-4d5c-8107-5544fe57f3a7: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload c75d2de4-1286-4a83-8150-e385a92bac91: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload de7af853-9c30-4e68-a0b7-6c6cd001b0ca: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 5b25d369-fb17-46d1-af28-8edbe0332f91: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload a10583dd-241e-49f9-874b-dbffd8265e33: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload db06869f-b23e-40c4-84c0-7092252062a8: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 90113212-581d-487e-9c0f-68447f0e4595: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 134a37d2-e292-4b10-8ac7-37e066828abe: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload c4349ccd-2d92-471e-8c7e-8ae218ea77b1: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 4a2ee8aa-dfe9-4529-9c48-6b1efbbed59e: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 40eb4f76-331e-470a-a82d-cc607392cc53: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 4c97e5d8-0194-49fd-9869-7dc2c097919d: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 08ac8463-00e3-45d6-8584-3c6ddc6b8262: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 25915dcb-c733-4453-ba0e-48502152f27f: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload df7a2ce1-274e-453e-bc9e-ebdec15fcb5e: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 991b0754-ca56-4a0d-8c60-67fb6d2470d1: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 9d3288c7-7a2a-4303-86d9-c0d62c1b7d51: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload b442a48b-8eac-484b-8f78-827ffcc22a2f: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 5fb4af1e-52aa-4e38-bbde-f81dc29f9fca: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 77b0a677-1aa2-48cb-8a3c-40b58c7e362c: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 2142bbf9-1947-4d7f-a2b5-a7c46b041791: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 0fbe0995-d08b-4475-94e8-777fb37d2a1b: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 6e32a0fb-8260-4b5d-8443-cf5748e6bf49: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload a56f5e16-c5ee-4dc6-b714-27df96c44da6: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload b6559a68-867a-4f52-a5a8-7ad81cbec17f: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 20e98c2f-f576-413b-8d7d-0274c77391dd: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 6d519dae-d01e-4c30-a56e-e82d96cdebe8: RUNTIME_ERROR
+[modal-client] 2026-02-23T17:21:20-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConflictError: App state is APP_STATE_STOPPED
+2026-02-23 17:21:20,309 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConflictError: App state is APP_STATE_STOPPED
+Solution 'kernforge_9645bd66' for workload 4bda04ed-0ffe-4fba-bbb3-6f8f1f4cb162: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 6f9ee359-39b6-4625-a5bd-9c3985bab231: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 68a2e6bd-f715-4f5e-af00-007be5a7c70a: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload c550f91a-f618-4a46-9505-75842fd68528: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload b578df96-879d-4ec0-bae7-7803b87beb3a: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload cfba415c-04aa-4d36-948d-bc163aac2425: RUNTIME_ERROR
+
+_gdn_prefill_qk4_v8_d128_k_last:   8%|▊         | 2/25 [29:50<6:01:53, 944.08s/it][ASolution 'kernforge_9645bd66' for workload 1eb8b329-687d-4895-81ac-9759db0305b6: RUNTIME_ERROR
+Solution 'kernforge_9645bd66' for workload 22b2b40a-a828-4be3-82be-4f5b2fa7d117: RUNTIME_ERROR
+Stopping app - local client disconnected. Use `modal run --detach` to keep apps running even if your local client disconnects.
+[modal-client] 2026-02-23T17:21:35-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConflictError: App state is APP_STATE_STOPPED
+2026-02-23 17:21:35,423 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConflictError: App state is APP_STATE_STOPPED
+[modal-client] 2026-02-23T17:21:50-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConflictError: App state is APP_STATE_STOPPED
+2026-02-23 17:21:50,527 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConflictError: App state is APP_STATE_STOPPED
+2026-02-23 17:22:02,045 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-02-23 17:22:02,272 - ERROR - Modal app stopped at step 3 — aborting remaining steps
+_gdn_prefill_qk4_v8_d128_k_last:   8%|▊         | 2/25 [30:32<5:51:10, 916.10s/it]
+Completed: gdn_gdn_prefill_qk4_v8_d128_k_last — Correct: False, Speedup: 0.0000
+Processing problems: 100%|██████████| 1/1 [30:32<00:00, 1832.22s/it]Processing problems: 100%|██████████| 1/1 [30:32<00:00, 1832.22s/it]
+
+============================================================
+Results: 0/1 correct, Sum speedup: 0.0000
+Average speedup: 0.0000
+Accuracy: 0.00%
+✓ App completed. View run at 
+https://modal.com/apps/tiiliass/main/ap-nOHbA2XUqndOxygvs2CRW8

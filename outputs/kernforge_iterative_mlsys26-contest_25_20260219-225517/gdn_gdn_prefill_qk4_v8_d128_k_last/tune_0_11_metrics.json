@@ -1,0 +1,1 @@
+{"compiled": false, "correct": false, "speedup": 0.0, "latency_ms": null, "task_id": "gdn_prefill_qk4_v8_d128_k_last", "error": "Static analysis: L132: SyntaxError: unterminated string literal (detected at line 132)", "stats": null}

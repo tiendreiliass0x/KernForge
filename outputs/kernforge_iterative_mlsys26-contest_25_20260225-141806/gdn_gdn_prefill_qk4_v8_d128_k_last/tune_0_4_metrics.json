@@ -1,0 +1,1 @@
+{"compiled": false, "correct": false, "speedup": 0.0, "latency_ms": null, "task_id": "gdn_prefill_qk4_v8_d128_k_last", "error": "Static analysis: L122: torch.* operation inside Triton kernel \u2014 must use tl.* equivalents; L123: torch.* operation inside Triton kernel \u2014 must use tl.* equivalents", "stats": null}

@@ -1,0 +1,379 @@
+## Problem Statement
+
+You tune the custom Triton kernels to get better performance. Apply small, targeted edits
+to the latest kernel version to fix correctness errors or improve performance.
+
+## Hardware Information
+
+- GPU: NVIDIA B200, Blackwell architecture.
+
+## Correctness Error Analysis
+
+Your kernel produced incorrect results. Common causes:
+
+1. **Missing masks**: Check every tl.load() and tl.store() — add mask= for variable dims
+2. **bf16 accumulator**: Change tl.zeros(..., dtype=tl.bfloat16) → dtype=tl.float32
+3. **Wrong stride**: Don't assume contiguous layout — pass strides as arguments
+4. **Grid mismatch**: Verify grid dimensions match tl.program_id() usage
+5. **tl.dot K-dimension**: Must be multiple of 16 for tensor cores
+6. **Off-by-one in tiling**: Check boundary conditions for non-divisible dimensions
+## Task Instruction
+
+Kernel definition:
+```python
+{
+    "name": "gdn_decode_qk4_v8_d128_k_last",
+    "description": "Gated Delta Net decode with GVA configuration and k-last state layout. Single-token generation with recurrent state update. Captured from Qwen3 Next linear attention layers (TP=4).",
+    "op_type": "gdn",
+    "tags": [
+        "stage:decode",
+        "status:verified",
+        "model:qwen3-next",
+        "layout:k-last"
+    ],
+    "axes": {
+        "batch_size": {
+            "type": "var",
+            "description": "Number of sequences being decoded concurrently."
+        },
+        "seq_len": {
+            "type": "const",
+            "value": 1,
+            "description": "Sequence length (always 1 for single-token decode)."
+        },
+        "num_q_heads": {
+            "type": "const",
+            "value": 4,
+            "description": "Number of query heads (same as key heads in GVA mode, TP=4, 16/4=4)."
+        },
+        "num_k_heads": {
+            "type": "const",
+            "value": 4,
+            "description": "Number of key heads (TP=4, 16/4=4)."
+        },
+        "num_v_heads": {
+            "type": "const",
+            "value": 8,
+            "description": "Number of value heads (GVA: more value heads than query heads, TP=4, 32/4=8)."
+        },
+        "head_size": {
+            "type": "const",
+            "value": 128
+        }
+    },
+    "constraints": [
+        "num_v_heads >= num_q_heads",
+        "num_v_heads % num_q_heads == 0",
+        "num_k_heads == num_q_heads"
+    ],
+    "inputs": {
+        "q": {
+            "shape": [
+                "batch_size",
+                "seq_len",
+                "num_q_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Query tensor for single token decode."
+        },
+        "k": {
+            "shape": [
+                "batch_size",
+                "seq_len",
+                "num_k_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Key tensor for single token decode."
+        },
+        "v": {
+            "shape": [
+                "batch_size",
+                "seq_len",
+                "num_v_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Value tensor for single token decode."
+        },
+        "state": {
+            "shape": [
+                "batch_size",
+                "num_v_heads",
+                "head_size",
+                "head_size"
+            ],
+            "dtype": "float32",
+            "description": "Recurrent state in k-last layout [B, H, V, K].",
+            "optional": true
+        },
+        "A_log": {
+            "shape": [
+                "num_v_heads"
+            ],
+            "dtype": "float32",
+            "description": "Log decay parameter (learnable). Used to compute g = exp(-exp(A_log) * softplus(a + dt_bias))."
+        },
+        "a": {
+            "shape": [
+                "batch_size",
+                "seq_len",
+                "num_v_heads"
+            ],
+            "dtype": "bfloat16",
+            "description": "Input-dependent decay from projection."
+        },
+        "dt_bias": {
+            "shape": [
+                "num_v_heads"
+            ],
+            "dtype": "float32",
+            "description": "Decay bias (learnable). Added to 'a' before softplus."
+        },
+        "b": {
+            "shape": [
+                "batch_size",
+                "seq_len",
+                "num_v_heads"
+            ],
+            "dtype": "bfloat16",
+            "description": "Update gate input from projection. beta = sigmoid(b)."
+        },
+        "scale": {
+            "shape": null,
+            "dtype": "float32",
+            "description": "Scale factor. Default is 1/sqrt(head_size)."
+        }
+    },
+    "outputs": {
+        "output": {
+            "shape": [
+                "batch_size",
+                "seq_len",
+                "num_v_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Attention output. Shape follows num_v_heads in GVA mode."
+        },
+        "new_state": {
+            "shape": [
+                "batch_size",
+                "num_v_heads",
+                "head_size",
+                "head_size"
+            ],
+            "dtype": "float32",
+            "description": "Updated recurrent state in k-last layout [B, H, V, K]."
+        }
+    },
+    "reference": "import math\nimport torch\nimport torch.nn.functional as F\n\n\ndef matmul(a: torch.Tensor, b: torch.Tensor):\n    \"\"\"Float32 matmul for numerical stability.\"\"\"\n    return a.float() @ b.float()\n\n\n@torch.no_grad()\ndef run(q, k, v, state, A_log, a, dt_bias, b, scale):\n    \"\"\"\n    Gated Delta Net decode reference implementation (k-last layout).\n    \n    State layout: [B, H, V, K] (k-last, K dimension at the end)\n    \n    Gate computation:\n    g = exp(-exp(A_log) * softplus(a + dt_bias))\n    beta = sigmoid(b)\n    \n    Delta rule update:\n    state_new = g * state_old + k^T @ (beta * v + (1-beta) * k @ state_old) - k^T @ (k @ state_old)\n    output = scale * q @ state_new\n    \"\"\"\n    B, T, num_q_heads, K = q.shape\n    _, _, num_k_heads, _ = k.shape\n    _, _, num_v_heads, V = v.shape\n    num_heads = num_v_heads\n    device = q.device\n    \n    assert num_q_heads == 4\n    assert num_k_heads == 4\n    assert num_v_heads == 8\n    assert K == 128 and V == 128\n    assert T == 1\n    \n    if scale is None or scale == 0.0:\n        scale = 1.0 / math.sqrt(K)\n    \n    # Compute g and beta from raw parameters\n    x = a.float() + dt_bias.float()  # [B, 1, HV]\n    g = torch.exp(-torch.exp(A_log.float()) * F.softplus(x))  # [B, 1, HV]\n    beta = torch.sigmoid(b.float())  # [B, 1, HV]\n    \n    q_f32 = q.squeeze(1).float()\n    k_f32 = k.squeeze(1).float()\n    v_f32 = v.squeeze(1).float()\n    g_f32 = g.squeeze(1).float()\n    beta_f32 = beta.squeeze(1).float()\n    \n    if state is not None:\n        state_f32 = state.float()\n    else:\n        state_f32 = torch.zeros(B, num_heads, V, K, dtype=torch.float32, device=device)\n    \n    q_exp = q_f32.repeat_interleave(num_v_heads // num_q_heads, dim=1)\n    k_exp = k_f32.repeat_interleave(num_v_heads // num_k_heads, dim=1)\n    \n    new_state = torch.zeros_like(state_f32)\n    output = torch.zeros(B, num_heads, V, dtype=torch.float32, device=device)\n    \n    for b_idx in range(B):\n        for h_idx in range(num_heads):\n            q_h = q_exp[b_idx, h_idx]\n            k_h = k_exp[b_idx, h_idx]\n            v_h = v_f32[b_idx, h_idx]\n            h_state = state_f32[b_idx, h_idx].clone().transpose(-1, -2)  # [V,K] -> [K,V]\n            g_val = g_f32[b_idx, h_idx]\n            beta_val = beta_f32[b_idx, h_idx]\n            \n            old_state = g_val * h_state\n            old_v = k_h @ old_state\n            new_v = beta_val * v_h + (1 - beta_val) * old_v\n            state_remove = k_h.unsqueeze(1) @ old_v.unsqueeze(0)\n            state_update = k_h.unsqueeze(1) @ new_v.unsqueeze(0)\n            h_state = old_state - state_remove + state_update\n            \n            output[b_idx, h_idx] = scale * (q_h @ h_state)\n            new_state[b_idx, h_idx] = h_state.transpose(-1, -2)  # [K,V] -> [V,K]\n    \n    output = output.unsqueeze(1).to(torch.bfloat16)\n    return output, new_state"
+}
+```
+
+The input shapes and dtype are: {'q': {'shape': ['batch_size', 'seq_len', 'num_q_heads', 'head_size'], 'dtype': 'bfloat16', 'description': 'Query tensor for single token decode.'}, 'k': {'shape': ['batch_size', 'seq_len', 'num_k_heads', 'head_size'], 'dtype': 'bfloat16', 'description': 'Key tensor for single token decode.'}, 'v': {'shape': ['batch_size', 'seq_len', 'num_v_heads', 'head_size'], 'dtype': 'bfloat16', 'description': 'Value tensor for single token decode.'}, 'state': {'shape': ['batch_size', 'num_v_heads', 'head_size', 'head_size'], 'dtype': 'float32', 'description': 'Recurrent state in k-last layout [B, H, V, K].', 'optional': True}, 'A_log': {'shape': ['num_v_heads'], 'dtype': 'float32', 'description': 'Log decay parameter (learnable). Used to compute g = exp(-exp(A_log) * softplus(a + dt_bias)).'}, 'a': {'shape': ['batch_size', 'seq_len', 'num_v_heads'], 'dtype': 'bfloat16', 'description': 'Input-dependent decay from projection.'}, 'dt_bias': {'shape': ['num_v_heads'], 'dtype': 'float32', 'description': "Decay bias (learnable). Added to 'a' before softplus."}, 'b': {'shape': ['batch_size', 'seq_len', 'num_v_heads'], 'dtype': 'bfloat16', 'description': 'Update gate input from projection. beta = sigmoid(b).'}, 'scale': {'shape': None, 'dtype': 'float32', 'description': 'Scale factor. Default is 1/sqrt(head_size).'}}
+
+### Test Conditions
+- **Correctness**: Verified against reference implementation
+- **Warm-up**: 3 runs (autotuning happens here)
+- **Performance**: 100 runs for timing
+
+### Edit Format
+
+Apply targeted str_replace edits. Keep the high-level architecture unchanged.
+
+CRITICAL RULES:
+1. `old_str` must match EXACTLY (including whitespace and indentation)
+2. `old_str` must be unique in the file (include 3-5 lines of context)
+3. `new_str` must be different from `old_str`
+4. Send ALL edits in a single response
+
+Output format:
+
+<reasoning_1>
+// why this edit improves the kernel
+</reasoning_1>
+<old_str_1>
+// exact code to replace
+</old_str_1>
+<new_str_1>
+// improved code
+</new_str_1>
+
+### Previous Kernels and Metrics:
+
+<Previous Kernels and Metrics>
+
+### 0-th attempt:
+
+```python
+import triton
+import triton.language as tl
+import torch
+
+@triton.autotune(
+    configs=[
+        triton.Config({'BLOCK_V': 32}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_V': 64}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_V': 64}, num_warps=8, num_stages=2),
+        triton.Config({'BLOCK_V': 128}, num_warps=8, num_stages=1),
+    ],
+    key=['V', 'K'],
+)
+@triton.jit
+def gdn_decode_kernel(
+    q_ptr, k_ptr, v_ptr, state_ptr, new_state_ptr, output_ptr,
+    A_log_ptr, a_ptr, dt_bias_ptr, b_ptr, scale_ptr,
+    stride_sb, stride_sh, stride_sv, stride_sk,
+    B, H_q, H_v, K: tl.constexpr, V: tl.constexpr,
+    BLOCK_V: tl.constexpr,
+):
+    i_b = tl.program_id(0)
+    i_hv = tl.program_id(1)
+    i_tv = tl.program_id(2)
+
+    gva_ratio = V // K
+    i_hq = i_hv // (H_v // H_q)
+
+    offs_k = tl.arange(0, K)
+    q = tl.load(q_ptr + i_b * H_q * K + i_hq * K + offs_k).to(tl.float32)
+    k = tl.load(k_ptr + i_b * H_q * K + i_hq * K + offs_k).to(tl.float32)
+
+    offs_v = i_tv * BLOCK_V + tl.arange(0, BLOCK_V)
+    v_mask = offs_v < V
+    v = tl.load(v_ptr + i_b * H_v * V + i_hv * V + offs_v, mask=v_mask, other=0.0).to(tl.float32)
+
+    x = tl.load(a_ptr + i_b * H_v + i_hv).to(tl.float32) + tl.load(dt_bias_ptr + i_hv).to(tl.float32)
+    g = tl.exp(-tl.exp(tl.load(A_log_ptr + i_hv).to(tl.float32)) * tl.softplus(x))
+    beta = tl.sigmoid(tl.load(b_ptr + i_b * H_v + i_hv).to(tl.float32))
+    scale = tl.load(scale_ptr).to(tl.float32)
+
+    ak = g * beta * k
+    dk = g * k
+
+    state_offset = i_b * stride_sb + i_hv * stride_sh
+    s_ptrs = state_ptr + state_offset + offs_v[:, None] * stride_sv + offs_k[None, :]
+    s_mask = v_mask[:, None]
+
+    state_tile = tl.load(s_ptrs, mask=s_mask, other=0.0)
+
+    sk = tl.sum(state_tile * k[None, :], axis=1)
+
+    state_tile = g * state_tile
+    state_tile = state_tile - sk[:, None] * ak[None, :]
+    state_tile = state_tile + v[:, None] * dk[None, :]
+
+    output_partial = tl.sum(state_tile * q[None, :], axis=1) * scale
+
+    tl.store(s_ptrs, state_tile, mask=s_mask)
+    out_ptrs = output_ptr + i_b * H_v * V + i_hv * V + offs_v
+    tl.store(out_ptrs, output_partial.to(tl.bfloat16), mask=v_mask)
+
+
+def gdn_decode(q, k, v, state, A_log, a, dt_bias, b, scale):
+    B, H_q, K = q.shape
+    _, H_v, V = v.shape
+
+    output = torch.empty(B, H_v, V, dtype=torch.bfloat16, device=q.device)
+    new_state = state.clone()
+
+    grid = lambda meta: (B, H_v, triton.cdiv(V, meta['BLOCK_V']))
+    gdn_decode_kernel[grid](
+        q, k, v, new_state, new_state, output,
+        A_log, a, dt_bias, b, scale,
+        state.stride(0), state.stride(1), state.stride(2), state.stride(3),
+        B, H_q, H_v, K, V,
+    )
+    return output, new_state
+```
+
+### 0-th Runtime Metrics:
+compiled=False correct=False speedup=0.0 latency_ms=None task_id='gdn_decode_qk4_v8_d128_k_last' error="Static analysis: LNone: No entry point function found. Expected 'run'. Functions: ['gdn_decode_kernel', 'gdn_decode']" stats=None
+
+### 1-th attempt:
+
+```python
+import triton
+import triton.language as tl
+import torch
+
+@triton.autotune(
+    configs=[
+        triton.Config({'BLOCK_V': 32}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_V': 64}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_V': 64}, num_warps=8, num_stages=2),
+        triton.Config({'BLOCK_V': 128}, num_warps=8, num_stages=1),
+    ],
+    key=['V', 'K'],
+)
+@triton.jit
+def gdn_decode_kernel(
+    q_ptr, k_ptr, v_ptr, state_ptr, new_state_ptr, output_ptr,
+    A_log_ptr, a_ptr, dt_bias_ptr, b_ptr, scale_ptr,
+    stride_sb, stride_sh, stride_sv, stride_sk,
+    B, H_q, H_v, K: tl.constexpr, V: tl.constexpr,
+    BLOCK_V: tl.constexpr,
+):
+    i_b = tl.program_id(0)
+    i_hv = tl.program_id(1)
+    i_tv = tl.program_id(2)
+
+    gva_ratio = V // K
+    i_hq = i_hv // (H_v // H_q)
+
+    offs_k = tl.arange(0, K)
+    q = tl.load(q_ptr + i_b * H_q * K + i_hq * K + offs_k).to(tl.float32)
+    k = tl.load(k_ptr + i_b * H_q * K + i_hq * K + offs_k).to(tl.float32)
+
+    offs_v = i_tv * BLOCK_V + tl.arange(0, BLOCK_V)
+    v_mask = offs_v < V
+    v = tl.load(v_ptr + i_b * H_v * V + i_hv * V + offs_v, mask=v_mask, other=0.0).to(tl.float32)
+
+    x = tl.load(a_ptr + i_b * H_v + i_hv).to(tl.float32) + tl.load(dt_bias_ptr + i_hv).to(tl.float32)
+    g = tl.exp(-tl.exp(tl.load(A_log_ptr + i_hv).to(tl.float32)) * tl.softplus(x))
+    beta = tl.sigmoid(tl.load(b_ptr + i_b * H_v + i_hv).to(tl.float32))
+    scale = tl.load(scale_ptr).to(tl.float32)
+
+    ak = g * beta * k
+    dk = g * k
+
+    state_offset = i_b * stride_sb + i_hv * stride_sh
+    s_ptrs = state_ptr + state_offset + offs_v[:, None] * stride_sv + offs_k[None, :]
+    s_mask = v_mask[:, None]
+
+    state_tile = tl.load(s_ptrs, mask=s_mask, other=0.0)
+
+    sk = tl.sum(state_tile * k[None, :], axis=1)
+
+    state_tile = g * state_tile
+    state_tile = state_tile - sk[:, None] * ak[None, :]
+    state_tile = state_tile + v[:, None] * dk[None, :]
+
+    output_partial = tl.sum(state_tile * q[None, :], axis=1) * scale
+
+    tl.store(s_ptrs, state_tile, mask=s_mask)
+    out_ptrs = output_ptr + i_b * H_v * V + i_hv * V + offs_v
+    tl.store(out_ptrs, output_partial.to(tl.bfloat16), mask=v_mask)
+
+
+def run(q, k, v, state, A_log, a, dt_bias, b, scale):
+    B, H_q, K = q.shape
+    _, H_v, V = v.shape
+
+    output = torch.empty(B, H_v, V, dtype=torch.bfloat16, device=q.device)
+    new_state = state.clone()
+
+    grid = lambda meta: (B, H_v, triton.cdiv(V, meta['BLOCK_V']))
+    gdn_decode_kernel[grid](
+        q, k, v, new_state, new_state, output,
+        A_log, a, dt_bias, b, scale,
+        state.stride(0), state.stride(1), state.stride(2), state.stride(3),
+        B, H_q, H_v, K, V,
+    )
+    return output, new_state
+```
+
+### 1-th Runtime Metrics:
+compiled=True correct=False speedup=0.0 latency_ms=None task_id='gdn_decode_qk4_v8_d128_k_last' error='RUNTIME_ERROR: Traceback (most recent call last):\n  File "/usr/local/lib/python3.12/site-packages/flashinfer_bench/bench/evaluators/default.py", line 116, in check_correctness\n    result = sol_runnable(*inp)\n             ^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/site-packages/flashinfer_bench/compile/runnable.py", line 95, in __call__\n    ret = self._callable(*args)\n          ^^^^^^^^^^^^^^^^^^^^^\n  File "/root/.cache/flashinfer_bench/cache/triton/fib_triton_kernforge_c697caa3_1cdef9/fib_triton_kernforge_c697caa3_1cdef9/main.py", line 65, in run\n    B, H_q, K = q.shape\n    ^^^^^^^^^\nValueError: too many values to unpack (expected 3)\n' stats=None
+</Previous Kernels and Metrics>

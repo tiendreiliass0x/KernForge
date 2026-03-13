@@ -1,0 +1,21 @@
+[project]
+name = "kernforge"
+version = "0.1.0"
+description = "Agentic GPU kernel generation and evolution system"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.40.0",
+    "flashinfer-bench>=0.1.0",
+    "torch>=2.0.0",
+    "triton>=2.3.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "toml>=0.10.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+openai = ["openai>=1.0.0"]
+
+[project.scripts]
+kernforge = "kernforge.cli:main"

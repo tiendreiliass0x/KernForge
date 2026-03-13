@@ -1,0 +1,9 @@
+{
+    "compiled": true,
+    "correct": false,
+    "speedup": 0.0,
+    "latency_ms": null,
+    "task_id": "gdn_prefill_qk4_v8_d128_k_last",
+    "error": "Lookup failed for Function 'remote_eval_kernel' from the 'kernforge-bench' app: Function 'remote_eval_kernel' not found on App 'kernforge-bench' in environment 'main'.",
+    "stats": null
+}

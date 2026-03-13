@@ -1,0 +1,1 @@
+{"compiled": false, "correct": false, "speedup": 0.0, "latency_ms": null, "task_id": "gdn_prefill_qk4_v8_d128_k_last", "error": "Static analysis: L251: .item() inside Triton kernel \u2014 can't transfer to CPU during kernel execution", "stats": null}

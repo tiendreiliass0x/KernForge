@@ -1,0 +1,655 @@
+✓ Initialized. View run at 
+https://modal.com/apps/tiiliass/main/ap-SCH1bV7whshZMySo1gLItM
+✓ Created objects.
+└── 🔨 Created function create_modal_app.<locals>.remote_eval_kernel.
+2026-02-25 23:50:54,511 - INFO - Dataset 'mlsys26-contest' found in Modal Volume, skipping upload
+Processing problems:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-25 23:50:54,869 - INFO - Loaded 0 strategy records from /Users/iliasstiendre/.kernforge/strategy_db.json
+
+_gdn_prefill_qk4_v8_d128_k_last:   0%|          | 0/25 [00:00<?, ?it/s][A2026-02-25 23:53:26,593 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 13.1.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+Solution 'kernforge_a9757a23' for workload db06869f-b23e-40c4-84c0-7092252062a8: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 90113212-581d-487e-9c0f-68447f0e4595: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 134a37d2-e292-4b10-8ac7-37e066828abe: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload c4349ccd-2d92-471e-8c7e-8ae218ea77b1: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 4a2ee8aa-dfe9-4529-9c48-6b1efbbed59e: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 40eb4f76-331e-470a-a82d-cc607392cc53: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 4c97e5d8-0194-49fd-9869-7dc2c097919d: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 08ac8463-00e3-45d6-8584-3c6ddc6b8262: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 25915dcb-c733-4453-ba0e-48502152f27f: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload df7a2ce1-274e-453e-bc9e-ebdec15fcb5e: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 991b0754-ca56-4a0d-8c60-67fb6d2470d1: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 9d3288c7-7a2a-4303-86d9-c0d62c1b7d51: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload b442a48b-8eac-484b-8f78-827ffcc22a2f: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 5fb4af1e-52aa-4e38-bbde-f81dc29f9fca: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 77b0a677-1aa2-48cb-8a3c-40b58c7e362c: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 2142bbf9-1947-4d7f-a2b5-a7c46b041791: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 0fbe0995-d08b-4475-94e8-777fb37d2a1b: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 6e32a0fb-8260-4b5d-8443-cf5748e6bf49: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload a56f5e16-c5ee-4dc6-b714-27df96c44da6: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload b6559a68-867a-4f52-a5a8-7ad81cbec17f: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 20e98c2f-f576-413b-8d7d-0274c77391dd: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 6d519dae-d01e-4c30-a56e-e82d96cdebe8: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 4bda04ed-0ffe-4fba-bbb3-6f8f1f4cb162: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 6f9ee359-39b6-4625-a5bd-9c3985bab231: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 68a2e6bd-f715-4f5e-af00-007be5a7c70a: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload c550f91a-f618-4a46-9505-75842fd68528: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload b578df96-879d-4ec0-bae7-7803b87beb3a: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload cfba415c-04aa-4d36-948d-bc163aac2425: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 1eb8b329-687d-4895-81ac-9759db0305b6: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 22b2b40a-a828-4be3-82be-4f5b2fa7d117: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 8f1fb046-df9e-4cce-ab89-56e334cec48c: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload f06d6d2a-828f-4352-8a04-f571ff6a8da2: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 821ff47d-8e2d-4ec2-9b69-6429cca83908: INCORRECT_NUMERICAL
+Solution 'kernforge_a9757a23' for workload 880e3744-7f0c-4fcc-a796-cd068af35680: INCORRECT_NUMERICAL
+[modal-client] 2026-02-26T00:00:58-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 744, in __connect__
+    async with self._connect_lock:
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/locks.py", line 14, in __aenter__
+    await self.acquire()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/locks.py", line 113, in acquire
+    await fut
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:00:58,663 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 744, in __connect__
+    async with self._connect_lock:
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/locks.py", line 14, in __aenter__
+    await self.acquire()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/locks.py", line 113, in acquire
+    await fut
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+[modal-client] 2026-02-26T00:02:14-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:02:14,806 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:03:13,384 - INFO -   Step 1: New best — compiled=True, correct=False, speedup=0.000
+
+_gdn_prefill_qk4_v8_d128_k_last:   4%|▍         | 1/25 [12:18<4:55:24, 738.52s/it][A2026-02-26 00:03:18,451 - INFO - Retrying request to /v1/messages in 0.402325 seconds
+2026-02-26 00:03:23,879 - INFO - Retrying request to /v1/messages in 0.968293 seconds
+2026-02-26 00:03:29,874 - WARNING - API call failed (attempt 1/5): Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+[modal-client] 2026-02-26T00:03:30-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:03:30,934 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:03:35,910 - INFO - Retrying request to /v1/messages in 0.436558 seconds
+2026-02-26 00:03:41,368 - INFO - Retrying request to /v1/messages in 0.901781 seconds
+2026-02-26 00:03:47,303 - WARNING - API call failed (attempt 2/5): Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+2026-02-26 00:03:55,112 - INFO - Retrying request to /v1/messages in 0.421375 seconds
+2026-02-26 00:04:00,558 - INFO - Retrying request to /v1/messages in 0.986612 seconds
+2026-02-26 00:04:06,570 - WARNING - API call failed (attempt 3/5): Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+2026-02-26 00:04:16,058 - INFO - Retrying request to /v1/messages in 0.393401 seconds
+2026-02-26 00:04:21,468 - INFO - Retrying request to /v1/messages in 0.914035 seconds
+2026-02-26 00:04:27,438 - WARNING - API call failed (attempt 4/5): Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+2026-02-26 00:04:40,896 - INFO - Retrying request to /v1/messages in 0.482717 seconds
+2026-02-26 00:04:46,405 - INFO - Retrying request to /v1/messages in 0.910117 seconds
+[modal-client] 2026-02-26T00:04:47-0800 Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:04:47,056 - ERROR - Loop attempt for _run_app.<locals>.heartbeat failed
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 173, in send_request
+    with self._wrapper:
+         ^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/utils.py", line 70, in __exit__
+    raise self._error
+TimeoutError: Deadline exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/async_utils.py", line 537, in loop_coro
+    await asyncio.wait_for(async_f(), timeout=timeout)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 56, in _heartbeat
+    await client.stub.AppHeartbeat(request, retry=Retry(attempt_timeout=HEARTBEAT_TIMEOUT))
+modal.exception.ConnectionError: Deadline exceeded
+2026-02-26 00:04:52,337 - WARNING - API call failed (attempt 5/5): Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+_gdn_prefill_qk4_v8_d128_k_last:   4%|▍         | 1/25 [13:57<5:34:59, 837.47s/it]
+Failed: gdn_gdn_prefill_qk4_v8_d128_k_last — Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 156, in _connect
+    stream = stream.start_tls(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 154, in start_tls
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectTimeout: _ssl.c:993: The handshake operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/anthropic/_base_client.py", line 1072, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectTimeout: _ssl.c:993: The handshake operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 475, in run_main_loop
+    best_kernel, best_metrics = run_agent(args, inference_server, level, problem_id)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 282, in run_agent
+    best_kernel, best_metric = _run_iterative_agent(
+                               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 365, in _run_iterative_agent
+    output = query_llm(inference_server, args.model_name, prompt,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 105, in query_llm
+    response = server.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/anthropic/_utils/_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/anthropic/resources/messages/messages.py", line 996, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/anthropic/_base_client.py", line 1364, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/anthropic/_base_client.py", line 1090, in request
+    raise APITimeoutError(request=request) from err
+anthropic.APITimeoutError: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/en/api/errors#long-requests for more details.
+Processing problems: 100%|██████████| 1/1 [13:57<00:00, 837.49s/it]Processing problems: 100%|██████████| 1/1 [13:57<00:00, 837.49s/it]
+
+============================================================
+Results: 0/1 correct, Sum speedup: 0.0000
+Average speedup: 0.0000
+Accuracy: 0.00%
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 158, in direct
+    return await self.client._call_unary(self.wrapped_method, req, timeout=timeout, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 338, in _call_unary
+    return await self._call_safely(coro, grpclib_method.name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 912, in __call__
+    await stream.send_message(message, end=True)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+ConnectionAbortedError: SSL handshake is taking longer than 60.0 seconds: aborting the connection
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 576, in <module>
+    with modal.enable_output(), modal_app.run():
+                                ^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/app.py", line 425, in run
+    async with _run_app(
+               ^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 377, in _run_app
+    await _status_based_disconnect(load_context.client, running_app.app_id, exc_info=None)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 261, in _status_based_disconnect
+    await _disconnect(client, app_id, reason, exc_str)
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/runner.py", line 236, in _disconnect
+    await client.stub.AppClientDisconnect(req_disconnect)
+modal.exception.ConnectionError: SSL handshake is taking longer than 60.0 seconds: aborting the connection
+2026-02-26 00:08:53,367 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-12' coro=<get_app_logs_loop() done, defined at /Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_output/pty.py:67> exception=ConnectionAbortedError('SSL handshake is taking longer than 60.0 seconds: aborting the connection')>
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_output/pty.py", line 173, in get_app_logs_loop
+    await _get_logs()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_output/pty.py", line 131, in _get_logs
+    async for log_batch in client.stub.AppGetLogs.unary_stream(request):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_grpc_client.py", line 190, in unary_stream
+    async for response in self.client._call_stream(self.wrapped_method, request, metadata=metadata):
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 351, in _call_stream
+    await self._call_safely(stream.send_message(request, end=True), f"{grpclib_method.name}.send_message")
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/client.py", line 298, in _call_safely
+    return await request_task
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 242, in send_message
+    await self.send_request()
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 174, in send_request
+    protocol = await self._channel.__connect__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 748, in __connect__
+    self._protocol = await self._create_connection()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/grpclib/client.py", line 725, in _create_connection
+    _, protocol = await self._loop.create_connection(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+ConnectionAbortedError: SSL handshake is taking longer than 60.0 seconds: aborting the connection

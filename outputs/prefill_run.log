@@ -1,0 +1,101 @@
+✓ Initialized. View run at 
+https://modal.com/apps/tiiliass/main/ap-hY7oBtBF0jKcEJxcI3bjxH
+✓ Created objects.
+└── 🔨 Created function create_modal_app.<locals>.remote_eval_kernel.
+2026-02-19 22:18:36,491 - INFO - Dataset 'mlsys26-contest' found in Modal Volume, skipping upload
+Processing problems:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-19 22:18:36,729 - INFO - Loaded 0 strategy records from /Users/iliasstiendre/.kernforge/strategy_db.json
+
+_gdn_prefill_qk4_v8_d128_k_last:   0%|          | 0/25 [00:00<?, ?it/s][A2026-02-19 22:20:09,628 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 13.1.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+Solution 'kernforge_f88bc33a' for workload 17775095-78aa-4d5c-8107-5544fe57f3a7: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload c75d2de4-1286-4a83-8150-e385a92bac91: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload de7af853-9c30-4e68-a0b7-6c6cd001b0ca: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 5b25d369-fb17-46d1-af28-8edbe0332f91: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload a10583dd-241e-49f9-874b-dbffd8265e33: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload db06869f-b23e-40c4-84c0-7092252062a8: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 90113212-581d-487e-9c0f-68447f0e4595: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 134a37d2-e292-4b10-8ac7-37e066828abe: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload c4349ccd-2d92-471e-8c7e-8ae218ea77b1: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 4a2ee8aa-dfe9-4529-9c48-6b1efbbed59e: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 40eb4f76-331e-470a-a82d-cc607392cc53: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 4c97e5d8-0194-49fd-9869-7dc2c097919d: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 08ac8463-00e3-45d6-8584-3c6ddc6b8262: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 25915dcb-c733-4453-ba0e-48502152f27f: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload df7a2ce1-274e-453e-bc9e-ebdec15fcb5e: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 991b0754-ca56-4a0d-8c60-67fb6d2470d1: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 9d3288c7-7a2a-4303-86d9-c0d62c1b7d51: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload b442a48b-8eac-484b-8f78-827ffcc22a2f: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 5fb4af1e-52aa-4e38-bbde-f81dc29f9fca: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 77b0a677-1aa2-48cb-8a3c-40b58c7e362c: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 2142bbf9-1947-4d7f-a2b5-a7c46b041791: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 0fbe0995-d08b-4475-94e8-777fb37d2a1b: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 6e32a0fb-8260-4b5d-8443-cf5748e6bf49: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload a56f5e16-c5ee-4dc6-b714-27df96c44da6: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload b6559a68-867a-4f52-a5a8-7ad81cbec17f: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 20e98c2f-f576-413b-8d7d-0274c77391dd: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 6d519dae-d01e-4c30-a56e-e82d96cdebe8: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 4bda04ed-0ffe-4fba-bbb3-6f8f1f4cb162: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 6f9ee359-39b6-4625-a5bd-9c3985bab231: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload 68a2e6bd-f715-4f5e-af00-007be5a7c70a: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload c550f91a-f618-4a46-9505-75842fd68528: RUNTIME_ERROR
+Solution 'kernforge_f88bc33a' for workload b578df96-879d-4ec0-bae7-7803b87beb3a: RUNTIME_ERROR
+Task's current input(s) ["in-01KHWV9B5PK3RX0D7MMB9R5Y4W:1771568409785-0"] cancelled because: Task's current input in-01KHWV9B5PK3RX0D7MMB9R5Y4W:1771568409785-0 hit its timeout of 300s
+[modal-client] 2026-02-20T06:25:16+0000 Received a cancellation signal while processing input ('in-01KHWV9B5PK3RX0D7MMB9R5Y4W:1771568409785-0',)
+_gdn_prefill_qk4_v8_d128_k_last:   0%|          | 0/25 [06:39<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 410, in run_main_loop
+    best_kernel, best_metrics = run_agent(args, inference_server, level, problem_id)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 255, in run_agent
+    best_kernel, best_metric = _run_iterative_agent(
+                               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/main.py", line 308, in _run_iterative_agent
+    metrics = eval_fn(kernel, problem_id, dataset_root)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/eval/flashinfer_eval.py", line 247, in _modal_with_static
+    return base_eval(kernel_code, task_id, dataset_root, backend, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/yenengaLabs/kernforge2.0/kernforge/eval/flashinfer_eval.py", line 257, in _modal_eval
+    result_dict = remote_fn.remote(kernel_code, task_id, dataset_name, backend, timeout)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_object.py", line 46, in wrapped
+    return await method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_functions.py", line 1766, in remote
+    return await self._call_function(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_functions.py", line 1710, in _call_function
+    return await invocation.run_function()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_functions.py", line 293, in run_function
+    return await _process_result(item.result, item.data_format, self.stub, self.client)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/iliasstiendre/miniconda3/envs/fi-bench/lib/python3.12/site-packages/modal/_utils/function_utils.py", line 489, in _process_result
+    raise FunctionTimeoutError(result.exception)
+modal.exception.FunctionTimeoutError: Task's current input in-01KHWV9B5PK3RX0D7MMB9R5Y4W:1771568409785-0 hit its timeout of 300s
+Processing problems: 100%|██████████| 1/1 [06:39<00:00, 399.79s/it]Processing problems: 100%|██████████| 1/1 [06:39<00:00, 399.79s/it]
+Failed: gdn_gdn_prefill_qk4_v8_d128_k_last — Task's current input in-01KHWV9B5PK3RX0D7MMB9R5Y4W:1771568409785-0 hit its timeout of 300s
+
+============================================================
+Results: 0/1 correct, Sum speedup: 0.0000
+Average speedup: 0.0000
+Accuracy: 0.00%
+Stopping app - local entrypoint completed.
+terminate called without an active exception
+Runner terminated.
+✓ App completed. View run at 
+https://modal.com/apps/tiiliass/main/ap-hY7oBtBF0jKcEJxcI3bjxH

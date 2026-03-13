@@ -1,0 +1,415 @@
+## Problem Statement
+
+You write custom Triton kernels to replace the pytorch operators in the given architecture to get speedups.
+
+You have complete freedom to choose the set of operators you want to replace.
+You may replace multiple operators with custom implementations,
+consider operator fusion opportunities (combining multiple operators into a single kernel),
+or algorithmic changes (such as online softmax). You are only limited by your imagination.
+
+The goal is to get the best performance for the given architecture.
+
+Generate a Triton kernel optimized for B200 GPU for
+
+{
+    "name": "gdn_prefill_qk4_v8_d128_k_last",
+    "description": "Gated Delta Net prefill with GVA configuration and k-last state layout. The state is in k-last layout [N, H, V, K]. Captured from Qwen3 Next linear attention layers (TP=4).",
+    "op_type": "gdn",
+    "tags": [
+        "stage:prefill",
+        "status:verified",
+        "model:qwen3-next",
+        "layout:k-last"
+    ],
+    "axes": {
+        "total_seq_len": {
+            "type": "var"
+        },
+        "num_seqs": {
+            "type": "var"
+        },
+        "num_q_heads": {
+            "type": "const",
+            "value": 4,
+            "description": "Number of query heads (same as key heads in GVA mode, TP=4, 16/4=4)."
+        },
+        "num_k_heads": {
+            "type": "const",
+            "value": 4,
+            "description": "Number of key heads (TP=4, 16/4=4)."
+        },
+        "num_v_heads": {
+            "type": "const",
+            "value": 8,
+            "description": "Number of value heads (GVA: more value heads than query heads, TP=4, 32/4=8)."
+        },
+        "head_size": {
+            "type": "const",
+            "value": 128
+        },
+        "len_cu_seqlens": {
+            "type": "var",
+            "description": "Length of cu_seqlens array (num_seqs + 1)."
+        }
+    },
+    "constraints": [
+        "len_cu_seqlens == num_seqs + 1",
+        "total_seq_len == cu_seqlens[-1].item()"
+    ],
+    "inputs": {
+        "q": {
+            "shape": [
+                "total_seq_len",
+                "num_q_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Query tensor."
+        },
+        "k": {
+            "shape": [
+                "total_seq_len",
+                "num_k_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Key tensor."
+        },
+        "v": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Value tensor."
+        },
+        "state": {
+            "shape": [
+                "num_seqs",
+                "num_v_heads",
+                "head_size",
+                "head_size"
+            ],
+            "dtype": "float32",
+            "description": "Recurrent state in k-last layout [N, H, V, K].",
+            "optional": true
+        },
+        "A_log": {
+            "shape": [
+                "num_v_heads"
+            ],
+            "dtype": "float32",
+            "description": "Log decay parameter (learnable). Used to compute g = exp(-exp(A_log) * softplus(a + dt_bias))."
+        },
+        "a": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads"
+            ],
+            "dtype": "bfloat16",
+            "description": "Input-dependent decay from projection."
+        },
+        "dt_bias": {
+            "shape": [
+                "num_v_heads"
+            ],
+            "dtype": "float32",
+            "description": "Decay bias (learnable). Added to 'a' before softplus."
+        },
+        "b": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads"
+            ],
+            "dtype": "bfloat16",
+            "description": "Update gate input from projection. beta = sigmoid(b)."
+        },
+        "cu_seqlens": {
+            "shape": [
+                "len_cu_seqlens"
+            ],
+            "dtype": "int64",
+            "description": "Cumulative sequence lengths for variable-length batching."
+        },
+        "scale": {
+            "shape": null,
+            "dtype": "float32",
+            "description": "Scale factor. Default is 1/sqrt(head_size)."
+        }
+    },
+    "outputs": {
+        "output": {
+            "shape": [
+                "total_seq_len",
+                "num_v_heads",
+                "head_size"
+            ],
+            "dtype": "bfloat16",
+            "description": "Attention output. Shape follows num_v_heads in GVA mode."
+        },
+        "new_state": {
+            "shape": [
+                "num_seqs",
+                "num_v_heads",
+                "head_size",
+                "head_size"
+            ],
+            "dtype": "float32",
+            "description": "Updated recurrent state in k-last layout [N, H, V, K]."
+        }
+    },
+    "reference": "import math\nimport torch\nimport torch.nn.functional as F\n\n\ndef matmul(a: torch.Tensor, b: torch.Tensor):\n    \"\"\"Float32 matmul for numerical stability.\"\"\"\n    return a.float() @ b.float()\n\n\n@torch.no_grad()\ndef run(q, k, v, state, A_log, a, dt_bias, b, cu_seqlens, scale):\n    \"\"\"\n    Gated Delta Net prefill reference implementation (k-last layout).\n    \n    State layout: [H, V, K] (k-last, K dimension at the end)\n    \n    Gate computation:\n    g = exp(-exp(A_log) * softplus(a + dt_bias))\n    beta = sigmoid(b)\n    \n    Delta rule update:\n    state_new = g * state_old + k^T @ (beta * v + (1-beta) * k @ state_old) - k^T @ (k @ state_old)\n    output = scale * q @ state_new\n    \"\"\"\n    total_seq_len, num_q_heads, head_size = q.shape\n    num_v_heads = v.shape[1]\n    num_k_heads = k.shape[1]\n    num_sab_heads = max(num_q_heads, num_v_heads)\n    num_seqs = cu_seqlens.size(0) - 1\n    device = q.device\n\n    assert num_q_heads == 4\n    assert num_k_heads == 4\n    assert num_v_heads == 8\n    assert head_size == 128\n\n    if scale is None or scale == 0.0:\n        scale = 1.0 / math.sqrt(head_size)\n\n    # Compute g and beta from raw parameters\n    x = a.float() + dt_bias.float()  # [total_seq_len, HV]\n    g = torch.exp(-torch.exp(A_log.float()) * F.softplus(x))  # [total_seq_len, HV]\n    beta = torch.sigmoid(b.float())  # [total_seq_len, HV]\n\n    q_exp = q.repeat_interleave(num_v_heads // num_q_heads, dim=1)\n    k_exp = k.repeat_interleave(num_v_heads // num_k_heads, dim=1)\n\n    output = torch.zeros(\n        (total_seq_len, num_sab_heads, head_size), dtype=torch.bfloat16, device=device\n    )\n    new_state = torch.zeros(\n        (num_seqs, num_sab_heads, head_size, head_size), dtype=torch.float32, device=device\n    )\n\n    for seq_idx in range(num_seqs):\n        seq_start = int(cu_seqlens[seq_idx].item())\n        seq_end = int(cu_seqlens[seq_idx + 1].item())\n        seq_len = seq_end - seq_start\n\n        if seq_len <= 0:\n            continue\n\n        if state is not None:\n            state_HKV = state[seq_idx].clone().float().transpose(-1, -2)  # [H,V,K] -> [H,K,V]\n        else:\n            state_HKV = torch.zeros(\n                (num_sab_heads, head_size, head_size), dtype=torch.float32, device=device\n            )\n\n        for i in range(seq_len):\n            t = seq_start + i\n            q_H1K = q_exp[t].unsqueeze(1).float()\n            k_H1K = k_exp[t].unsqueeze(1).float()\n            v_H1V = v[t].unsqueeze(1).float()\n            g_H11 = g[t].unsqueeze(1).unsqueeze(2)\n            beta_H11 = beta[t].unsqueeze(1).unsqueeze(2)\n\n            old_state_HKV = g_H11 * state_HKV\n            old_v_H1V = matmul(k_H1K, old_state_HKV)\n            new_v_H1V = beta_H11 * v_H1V + (1 - beta_H11) * old_v_H1V\n            state_remove = torch.einsum('hkl,hlv->hkv', k_H1K.transpose(-1, -2), old_v_H1V)\n            state_update = torch.einsum('hkl,hlv->hkv', k_H1K.transpose(-1, -2), new_v_H1V)\n            state_HKV = old_state_HKV - state_remove + state_update\n\n            o_H1V = scale * matmul(q_H1K, state_HKV)\n            output[t] = o_H1V.squeeze(1).to(torch.bfloat16)\n\n        new_state[seq_idx] = state_HKV.transpose(-1, -2)  # [H,K,V] -> [H,V,K]\n\n    return output, new_state"
+}
+
+Triton Version: 3.3.1
+
+Requirements:
+- Write clean, efficient Triton code optimized for B200 (Blackwell)
+- Use modern Triton syntax with proper grid computation
+- Include necessary imports (torch, triton, triton.language as tl)
+- Implement the exact functionality described in the specification
+- The reference code provides the mathematical specification but is unoptimized
+- Expose a "run" entry point function that can be called to execute the kernel
+- Return only the code, no explanations
+
+IMPORTANT SYNTAX RULES:
+- NO hexadecimal float literals (0x1.234p5) - use decimal equivalents
+- All code must be valid Python that passes ast.parse()
+- NO C/CUDA specific syntax - this is Python/Triton code
+
+## Critical Triton Bugs to Avoid
+
+1. **Missing masks**: ALWAYS use `mask=` on `tl.load()` and `tl.store()` for variable-size dimensions
+   ```python
+   x = tl.load(ptr + offs, mask=offs < N, other=0.0)  # CORRECT
+   x = tl.load(ptr + offs)  # WRONG — crashes on boundary tiles
+   ```
+
+2. **bf16 accumulators**: ALWAYS accumulate in float32, cast only at final store
+   ```python
+   acc = tl.zeros([M, N], dtype=tl.float32)  # CORRECT
+   acc = tl.zeros([M, N], dtype=tl.bfloat16)  # WRONG — catastrophic drift
+   ```
+
+3. **tl.dot dimensions**: Requires 2D inputs with K dimension multiple of 16
+   ```python
+   c = tl.dot(a, b)  # a must be [M,K], b must be [K,N], K % 16 == 0
+   ```
+
+4. **No torch/numpy in @triton.jit**: Use tl.* equivalents (tl.exp, tl.sigmoid, tl.sqrt)
+
+5. **Always pass strides as kernel arguments**: Never assume contiguous memory layout
+
+6. **Grid must match tl.program_id usage**: If kernel uses program_id(0) and program_id(1), grid must be 2D
+
+## B200 (Blackwell) Architecture Notes
+- HBM: 192GB, 8 TB/s bandwidth
+- SRAM: 256 KB per SM (use for staging data)
+- BF16 tensor core peak: 2,250 TFLOPS
+- 192 SMs — launch enough blocks to fill them (≥192 for full occupancy)
+- Registers: 65,536 per SM — keep per-thread usage < 128 for >25% occupancy
+- TMA available for async bulk memory copies (Triton handles via num_stages)
+- Arithmetic intensity crossover: ~280 FLOPs/byte
+
+## GDN (Gated Delta Net) Specific Guidance
+
+The GDN decode step has a recurrent state update:
+  S_t = α · S_{t-1} · (I - β · k · k^T) + dt · v · k^T
+
+Key patterns:
+- **Grid**: (batch, v_head, v_tiles) — one block per state tile
+- **GVA head mapping**: `qk_head = v_head // (H_v // H_q)` — integer division, NOT multiply
+- **State is always float32** — never bf16 for state arithmetic
+- **Precompute**: `ak = alpha * beta * k` and `dk = dt * k` outside the tile loop
+- **Fused update**: Decay + erase + delta write in ONE pass over the state tile
+- **K-last layout**: State stored as [batch, v_head, V, K] for coalesced access
+
+## Optimization Strategy
+
+Follow this progression (don't skip steps):
+
+1. **Correctness first**: Get a working kernel before optimizing
+2. **Use tl.dot()** for ALL matrix multiplications (10-50x faster than manual)
+3. **Add @triton.autotune** with at least 4-5 configurations varying BLOCK sizes and num_warps
+4. **Minimize HBM traffic**: Fuse operations, avoid intermediate writes
+5. **Coalesced memory access**: Fastest-varying dimension should be contiguous across threads
+
+### Autotune Template
+```python
+@triton.autotune(
+    configs=[
+        triton.Config({{'BLOCK_M': 64, 'BLOCK_N': 64}}, num_warps=4, num_stages=2),
+        triton.Config({{'BLOCK_M': 128, 'BLOCK_N': 64}}, num_warps=4, num_stages=3),
+        triton.Config({{'BLOCK_M': 128, 'BLOCK_N': 128}}, num_warps=8, num_stages=2),
+        triton.Config({{'BLOCK_M': 64, 'BLOCK_N': 128}}, num_warps=8, num_stages=2),
+    ],
+    key=[...],  # dimensions that change at runtime
+)
+```
+
+## Reference Implementations
+
+## Reference Implementations
+Study these working kernels before writing your own. Pay attention to the design choices annotated below.
+
+## Reference Implementation: GDN Decode (Fused State Update)
+Origin: fla (adapted) (https://github.com/fla-org/flash-linear-attention)
+Fused GDN decode with tiled state update. Key: all state operations (decay, erase, write, output) in one pass per tile.
+
+### Key Design Choices
+
+1. **Grid design**: (batch, v_head, v_tile) — one block per state tile
+2. **GVA mapping**: i_hq = i_hv // (H_v // H_q) — integer division, no repeat_interleave
+3. **Precompute gates**: ak = alpha * beta * k and dk = dt * k computed once, reused per tile element
+4. **Fused operations**: decay + householder + delta write in single pass over state tile
+5. **Mixed precision**: inputs loaded as bf16, cast to f32 for state arithmetic, output cast back to bf16
+6. **State tiling**: BLOCK_V tiles over rows (V dimension), full K=128 per tile
+7. **Autotune**: 4 configs varying BV and num_warps, keyed on V and K
+8. **Memory pattern**: K-last layout means K dimension is contiguous → coalesced loads
+
+
+### Source Code
+```python
+import triton
+import triton.language as tl
+import torch
+
+@triton.autotune(
+    configs=[
+        triton.Config({'BV': 32}, num_warps=4, num_stages=2),
+        triton.Config({'BV': 64}, num_warps=4, num_stages=2),
+        triton.Config({'BV': 64}, num_warps=8, num_stages=2),
+        triton.Config({'BV': 128}, num_warps=8, num_stages=1),
+    ],
+    key=['V', 'K'],
+)
+@triton.jit
+def gdn_decode_kernel(
+    # Pointers
+    q_ptr, k_ptr, v_ptr, state_ptr, new_state_ptr, output_ptr,
+    alpha_ptr, beta_ptr, dt_ptr, scale_ptr,
+    # Strides
+    stride_sb, stride_sh, stride_sv, stride_sk,
+    # Dimensions
+    B, H_q, H_v, K: tl.constexpr, V: tl.constexpr,
+    BV: tl.constexpr,
+):
+    """Fused GDN decode: state update + output in one kernel."""
+    # Grid: (batch, v_head, num_v_tiles)
+    i_b = tl.program_id(0)
+    i_hv = tl.program_id(1)
+    i_tv = tl.program_id(2)
+
+    # GVA mapping: v_head -> q/k head
+    gva_ratio = V // K  # typically 2 for GDN
+    i_hq = i_hv // (H_v // H_q)
+
+    # Load inputs (small, fits in registers)
+    offs_k = tl.arange(0, K)
+    q = tl.load(q_ptr + i_b * H_q * K + i_hq * K + offs_k).to(tl.float32)
+    k = tl.load(k_ptr + i_b * H_q * K + i_hq * K + offs_k).to(tl.float32)
+
+    offs_v = i_tv * BV + tl.arange(0, BV)
+    v_mask = offs_v < V
+    v = tl.load(v_ptr + i_b * H_v * V + i_hv * V + offs_v, mask=v_mask, other=0.0).to(tl.float32)
+
+    # Load gate values
+    alpha = tl.load(alpha_ptr + i_hq).to(tl.float32)  # per-head decay
+    beta = tl.load(beta_ptr + i_b * H_q + i_hq).to(tl.float32)  # per-token gate
+    dt = tl.load(dt_ptr + i_b * H_v + i_hv).to(tl.float32)  # per-head delta step
+    scale = tl.load(scale_ptr).to(tl.float32)
+
+    # Precompute: reduces per-element ops in tile loop
+    ak = alpha * beta * k  # for householder subtract
+    dk = dt * k            # for delta write
+
+    # Load state tile: [BV, K], f32
+    state_offset = i_b * stride_sb + i_hv * stride_sh
+    s_ptrs = state_ptr + state_offset + offs_v[:, None] * stride_sv + offs_k[None, :] * stride_sk
+    s_mask = v_mask[:, None]
+
+    state_tile = tl.load(s_ptrs, mask=s_mask, other=0.0)
+
+    # Fused update:
+    # 1. S @ k → partial dot product (reduction over K)
+    sk = tl.sum(state_tile * k[None, :], axis=1)  # [BV]
+
+    # 2. Decay + Householder erase + Delta write
+    state_tile = alpha * state_tile  # decay
+    state_tile = state_tile - sk[:, None] * ak[None, :]  # erase
+    state_tile = state_tile + v[:, None] * dk[None, :]  # write
+
+    # 3. Output: S_new @ q
+    output_partial = tl.sum(state_tile * q[None, :], axis=1) * scale  # [BV]
+
+    # Store updated state (f32)
+    tl.store(s_ptrs, state_tile, mask=s_mask)
+
+    # Atomically accumulate output (different v_tiles contribute to same output)
+    # OR: if BV == V, just store directly
+    out_ptrs = output_ptr + i_b * H_v * V + i_hv * V + offs_v
+    tl.store(out_ptrs, output_partial.to(tl.bfloat16), mask=v_mask)
+
+
+def gdn_decode(q, k, v, state, alpha, beta, dt, scale):
+    """Python wrapper for GDN decode kernel."""
+    B, H_q, K = q.shape
+    _, H_v, V = v.shape
+
+    output = torch.empty(B, H_v, V, dtype=torch.bfloat16, device=q.device)
+    new_state = state.clone()
+
+    grid = lambda meta: (B, H_v, triton.cdiv(V, meta['BV']))
+    gdn_decode_kernel[grid](
+        q, k, v, new_state, new_state, output,
+        alpha, beta, dt, scale,
+        state.stride(0), state.stride(1), state.stride(2), state.stride(3),
+        B, H_q, H_v, K, V,
+    )
+    return output, new_state
+
+```
+
+## Reference Implementation: GDN Chunk Attention (Intra-chunk)
+Origin: fla (conceptual) (https://github.com/fla-org/flash-linear-attention/tree/main/fla/ops/gated_delta_rule)
+Chunkwise parallel GDN: WY decomposition + intra-chunk attention. This is the PREFILL algorithm.
+
+### Key Design Choices
+
+1. **WY decomposition**: Avoids sequential d×d matrix products — instead builds W,Y incrementally (O(C) rank-1 updates)
+2. **Chunk size C**: Typically 64 — small enough for intra-chunk attention (64²=4K), large enough to amortize inter-chunk cost
+3. **Three-phase computation**: (1) build WY factors, (2) intra-chunk attention, (3) inter-chunk state scan
+4. **Parallelism**: Intra-chunk attention is fully parallel (like standard attention within chunk)
+5. **The inter-chunk scan is sequential** but only O(L/C) steps instead of O(L)
+
+
+### Source Code
+```python
+# Key insight: within a chunk of C tokens, the delta rule attention
+# can be decomposed into:
+#   1. A causal attention-like term (parallel over chunk)
+#   2. A cross-chunk term from the inter-chunk state
+#
+# The causal term uses WY representation to express
+# the product of Householder-like matrices:
+#   P = prod_t (I - beta_t * k_t * k_t^T) = I - W @ Y^T
+#
+# Where W, Y in R^{d x C} are built incrementally:
+#   Y[:, t] = k_t
+#   W[:, t] = beta_t * (I - W[:,:t] @ Y[:,:t]^T) @ k_t
+
+# The intra-chunk output for token t is:
+#   o_t = sum_{s<=t} [gamma_{t,s} * (alpha_s * beta_s * <k_s, S_{s-1} @ q_t> 
+#         - dt_s * <k_s, v_s> * <k_s, q_t>) + dt_s * <v_s, q_t>]
+#
+# where gamma_{t,s} = prod_{r=s+1}^{t} alpha_r * (1 - beta_r * <k_r, k_r>)
+
+# This is computed as a causal matrix multiplication:
+#   A[t, s] = <q_t, k_s>  (attention scores)
+#   Masked + scaled by gamma factors
+#   Output = A @ V (chunk-local "values" including state contribution)
+
+```
+
+Generate the complete, runnable implementation:
