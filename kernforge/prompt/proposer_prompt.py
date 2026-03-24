@@ -6,6 +6,8 @@ but injects optimization knowledge, common bug warnings, and kernel-type-specifi
 guidance that the baseline completely lacks.
 """
 
+from typing import Optional
+
 # ─── Baseline prompt components (kept for compatibility) ───
 
 PROBLEM_STATEMENT = """## Problem Statement
@@ -192,6 +194,7 @@ Key patterns:
 
 # ─── Strategy context (from cross-run learning) ───
 
+
 def format_strategy_context(strategy_db, kernel_type: str) -> str:
     """Format strategy DB into prompt context."""
     if strategy_db is None:
@@ -207,26 +210,39 @@ def format_strategy_context(strategy_db, kernel_type: str) -> str:
     if best:
         parts.append("Strategies that WORKED well (try these):")
         for s in best:
-            parts.append(f"  ✅ {s['strategy']}: {s['improvement_pct']:.1f}% faster")
+            strategy = getattr(s, "strategy", None)
+            if strategy is None and isinstance(s, dict):
+                strategy = s.get("strategy", "unknown")
+            improvement = getattr(s, "improvement_pct", None)
+            if improvement is None and isinstance(s, dict):
+                improvement = s.get("improvement_pct", 0.0)
+            parts.append(f"  - {strategy}: {float(improvement or 0.0):.1f}% faster")
     if failed:
         parts.append("\nStrategies that FAILED (avoid these):")
         for s in failed:
-            parts.append(f"  ❌ {s['strategy']}: {s['error_type']}")
+            strategy = getattr(s, "strategy", None)
+            if strategy is None and isinstance(s, dict):
+                strategy = s.get("strategy", "unknown")
+            error_type = getattr(s, "error_type", None)
+            if error_type is None and isinstance(s, dict):
+                error_type = s.get("error_type", "unknown failure")
+            parts.append(f"  - {strategy}: {error_type or 'unknown failure'}")
 
     return "\n".join(parts)
 
 
 # ─── Main prompt generation ───
 
+
 def generate_proposer_prompt(
     task_params: dict,
-    pool_prompt: str = None,
+    pool_prompt: Optional[str] = None,
     *,
-    kernel_type: str = None,
-    gpu_name: str = None,
+    kernel_type: Optional[str] = None,
+    gpu_name: Optional[str] = None,
     strategy_db=None,
-    corpus_context: str = None,
-    ladder_context: str = None,
+    corpus_context: Optional[str] = None,
+    ladder_context: Optional[str] = None,
 ) -> str:
     """
     Generate the proposer prompt with KernForge enhancements.
@@ -300,7 +316,9 @@ def generate_pool_prompt(
 
     parts = []
 
-    elite_part = _format_pool_single(elite_kernel_pool, elite_metrics_pool, elite_pool_ids)
+    elite_part = _format_pool_single(
+        elite_kernel_pool, elite_metrics_pool, elite_pool_ids
+    )
     if elite_part:
         parts.append("## Context type: elite\n\n" + elite_part)
 

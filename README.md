@@ -38,16 +38,18 @@ pip install -e .
 # Set API key
 export ANTHROPIC_API_KEY=sk-ant-...
 
-# Evolve a GDN decode kernel (Track C)
-python examples/evolve_gdn_decode.py --generations 15
+# Run the contest-compatible smoke config
+python -m kernforge.main --config config/config_smoke_test.yaml
 
-# Or use the CLI
-kernforge evolve --spec kernforge/templates/gdn_decode_qk16_v32_d128_k_last.json --generations 15
+# Run the full contest task list locally
+python -m kernforge.main --config config/config_deep.yaml --eval_backend local
 
-# Use a local model instead
-kernforge evolve --spec kernforge/templates/gdn_decode_qk16_v32_d128_k_last.json \
-    --backend openai --base-url http://localhost:8000/v1 --model qwen2.5-coder-32b
+# Or via the installed entrypoint
+kernforge --config config/config_smoke_test.yaml
 ```
+
+The old `kernforge evolve ...` CLI still exists as `kernforge-legacy`, but the
+baseline-compatible runner in `kernforge/main.py` is the canonical path.
 
 ## How It Works
 
@@ -75,19 +77,20 @@ kernforge evolve --spec kernforge/templates/gdn_decode_qk16_v32_d128_k_last.json
 kernforge/
 ├── kernforge/
 │   ├── agent/
-│   │   ├── generator.py     # LLM-powered kernel generation (Claude, OpenAI-compat)
-│   │   └── prompts.py       # System prompts encoding GPU optimization knowledge
+│   │   ├── hybrid_agent.py  # Hybrid explore/exploit runner
+│   │   ├── ladder.py        # Structured optimization ladder
+│   │   └── corpus.py        # Reference-kernel corpus
 │   ├── eval/
-│   │   └── evaluator.py     # Correctness + benchmark evaluation
-│   ├── kernel/
-│   │   ├── spec.py           # Kernel specification parser
-│   │   ├── solution.py       # Solution representation + serialization
-│   │   └── hardware.py       # GPU hardware specs (B200, H100)
-│   ├── templates/            # Built-in kernel spec templates
-│   ├── evolve.py             # Core evolution loop orchestrator
-│   └── cli.py                # Command-line interface
-├── examples/
-│   └── evolve_gdn_decode.py  # Quick-start example
+│   │   ├── flashinfer_eval.py # Contest-compatible evaluation path
+│   │   ├── modal_eval.py      # Remote B200 evaluation
+│   │   └── static_analysis.py # Pre-GPU validation
+│   ├── prompt/
+│   │   ├── proposer_prompt.py # Initial kernel generation prompt
+│   │   └── tuner_prompt.py    # Iterative edit prompt
+│   ├── main.py               # Canonical contest runner
+│   ├── submit.py             # Submission packer
+│   ├── evolve.py             # Legacy spec-driven loop
+│   └── cli.py                # Legacy CLI entrypoint
 └── pyproject.toml
 ```
 
@@ -128,27 +131,25 @@ state = loop.run(spec)
 git lfs install
 git clone https://huggingface.co/datasets/flashinfer-ai/mlsys26-contest
 
-# 2. Run evolution
-kernforge evolve \
-    --definition gdn_decode_qk16_v32_d128_k_last \
-    --dataset ./mlsys26-contest \
-    --generations 30 \
-    --output ./my_submission
+# 2. Run KernForge on contest definitions
+python -m kernforge.main \
+    --config config/config_deep.yaml \
+    --tasks_path config/tasks_all.txt \
+    --eval_backend modal
 
-# 3. Test on Modal B200
-cd my_submission/gdn_decode_qk16_v32_d128_k_last/submission
-pip install flashinfer-bench modal
-python scripts/run_modal.py
+# 3. Pack outputs into starter-kit / solution.json format
+python -m kernforge.submit \
+    --output_dir outputs/<run-dir> \
+    --name kernforge-v1
 
-# 4. Submit: share repo URL with organizers
+# 4. Submit the generated artifacts
 ```
 
 ## Roadmap
 
-- [ ] FlashInfer-Bench native integration (evaluate via `flashinfer-bench run`)
-- [ ] NCU profiling integration for bottleneck analysis
-- [ ] Parallel candidate generation (generate N variants, keep best)
-- [ ] Multi-track evolution (fused_moe, sparse_attention, gated_delta_net)
+- [x] FlashInfer-Bench native integration
+- [x] NCU profiling hooks and static analysis
+- [x] Parallel candidate generation and strategy learning
+- [ ] Unify the legacy `evolve.py` stack with the contest runner
+- [ ] Expand true end-to-end smoke coverage across local and Modal backends
 - [ ] CUDA backend support (CuTe DSL, CUTLASS)
-- [ ] Crossover: combine successful strategies from different lineages
-- [ ] Self-play: generate adversarial test cases to find correctness bugs

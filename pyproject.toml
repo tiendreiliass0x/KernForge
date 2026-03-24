@@ -10,6 +10,7 @@ dependencies = [
     "triton>=2.3.0",
     "pydantic>=2.0.0",
     "rich>=13.0.0",
+    "PyYAML>=6.0.0",
     "toml>=0.10.0",
 ]
 
@@ -18,4 +19,5 @@ dev = ["pytest", "ruff"]
 openai = ["openai>=1.0.0"]
 
 [project.scripts]
-kernforge = "kernforge.cli:main"
+kernforge = "kernforge.main:main"
+kernforge-legacy = "kernforge.cli:main"

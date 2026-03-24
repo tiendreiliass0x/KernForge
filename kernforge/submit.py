@@ -20,6 +20,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 
 def pack_single_kernel(
@@ -62,7 +63,7 @@ def pack_from_output_dir(
     output_dir: str,
     name_prefix: str = "kernforge",
     author: str = "kernforge",
-    total_steps: int = None,
+    total_steps: Optional[int] = None,
 ) -> list[dict]:
     """
     Pack all best kernels from a KernForge output directory.
@@ -128,12 +129,14 @@ def pack_from_output_dir(
             author=author,
         )
 
-        results.append({
-            "definition": definition,
-            "solution": solution,
-            "metrics": metrics,
-            "source_file": str(kernel_file),
-        })
+        results.append(
+            {
+                "definition": definition,
+                "solution": solution,
+                "metrics": metrics,
+                "source_file": str(kernel_file),
+            }
+        )
 
     return results
 
@@ -150,25 +153,25 @@ def write_starter_kit(solution: dict, output_dir: str):
     Write solution in starter-kit format:
       output_dir/
         config.toml
-        solution/triton/kernel.py
+        solution/triton/main.py
     """
     os.makedirs(os.path.join(output_dir, "solution", "triton"), exist_ok=True)
 
-    # Write kernel
+    # Write kernel source using the same entry point layout as flashinfer-bench.
     kernel_code = solution["sources"][0]["content"]
-    kernel_path = os.path.join(output_dir, "solution", "triton", "kernel.py")
+    kernel_path = os.path.join(output_dir, "solution", "triton", "main.py")
     with open(kernel_path, "w") as f:
         f.write(kernel_code)
 
     # Write config.toml
     config = f"""[solution]
-name = "{solution['name']}"
-definition = "{solution['definition']}"
-author = "{solution['author']}"
+name = "{solution["name"]}"
+definition = "{solution["definition"]}"
+author = "{solution["author"]}"
 
 [build]
 language = "triton"
-entry_point = "run"
+entry_point = "main.py::run"
 """
     config_path = os.path.join(output_dir, "config.toml")
     with open(config_path, "w") as f:
@@ -187,18 +190,35 @@ def main():
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--kernel", type=str, help="Path to a single kernel .py file")
-    group.add_argument("--output_dir", type=str, help="Path to KernForge output directory")
+    group.add_argument(
+        "--output_dir", type=str, help="Path to KernForge output directory"
+    )
 
-    parser.add_argument("--definition", type=str, help="Definition name (required with --kernel)")
-    parser.add_argument("--name", type=str, default="kernforge-solution",
-                        help="Solution name prefix")
+    parser.add_argument(
+        "--definition", type=str, help="Definition name (required with --kernel)"
+    )
+    parser.add_argument(
+        "--name", type=str, default="kernforge-solution", help="Solution name prefix"
+    )
     parser.add_argument("--author", type=str, default="kernforge", help="Author name")
-    parser.add_argument("--total_steps", type=int, default=None,
-                        help="Match kernels with this step count")
-    parser.add_argument("--format", choices=["json", "starter-kit", "both"], default="both",
-                        help="Output format")
-    parser.add_argument("--out", type=str, default="submissions",
-                        help="Output directory for submissions")
+    parser.add_argument(
+        "--total_steps",
+        type=int,
+        default=None,
+        help="Match kernels with this step count",
+    )
+    parser.add_argument(
+        "--format",
+        choices=["json", "starter-kit", "both"],
+        default="both",
+        help="Output format",
+    )
+    parser.add_argument(
+        "--out",
+        type=str,
+        default="submissions",
+        help="Output directory for submissions",
+    )
 
     args = parser.parse_args()
 
@@ -218,13 +238,9 @@ def main():
 
         print(f"\nPacking single kernel for '{args.definition}':")
         if args.format in ("json", "both"):
-            write_solution_json(
-                solution, os.path.join(args.out, f"{args.name}.json")
-            )
+            write_solution_json(solution, os.path.join(args.out, f"{args.name}.json"))
         if args.format in ("starter-kit", "both"):
-            write_starter_kit(
-                solution, os.path.join(args.out, args.name)
-            )
+            write_starter_kit(solution, os.path.join(args.out, args.name))
 
     else:
         print(f"\nScanning output directory: {args.output_dir}")
