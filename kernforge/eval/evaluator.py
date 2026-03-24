@@ -221,12 +221,11 @@ class KernelEvaluator:
                 )
 
             # Parse JSON output
+            import json as json_mod
             try:
-                import json as json_mod
                 data = json_mod.loads(result.stdout)
-            except (json.JSONDecodeError, ValueError):
+            except (json_mod.JSONDecodeError, ValueError):
                 # Try to find JSON in the output (may have log lines before it)
-                import json as json_mod
                 for line in result.stdout.strip().split("\n"):
                     line = line.strip()
                     if line.startswith("{"):

@@ -102,8 +102,11 @@ class KernelSpec:
         def_path = dataset_path / "definitions" / f"{definition_name}.json"
         if def_path.exists():
             return cls.from_file(def_path)
-        # Try searching
-        for f in (dataset_path / "definitions").glob("*.json"):
+
+        # Support nested definitions/<op_type>/<definition>.json layouts used by the dataset.
+        for f in (dataset_path / "definitions").rglob("*.json"):
+            if f.stem == definition_name:
+                return cls.from_file(f)
             with open(f) as fh:
                 data = json.load(fh)
                 if data.get("name") == definition_name:
